@@ -41,7 +41,7 @@ class CalendarWebServer(object):
         with open("token.json", "w") as text_file:
             print(flow.credentials.to_json(), file=text_file)
 
-        run(hardware_render, CalendarSource(stubbed=True), 1304, 984)
+        run(hardware_render, CalendarSource(stubbed=True), 1304, 984, true)
 
         return "Welcome back"
 
