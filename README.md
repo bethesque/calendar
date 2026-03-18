@@ -21,9 +21,15 @@ put powershell into venv mode using:
 ```
 
 ## linux
-put powershell into venv mode using:
+put shell into venv mode using:
 ```
 source ./venv/Scripts/activate
+```
+
+## mac
+put shell into venv mode using:
+```
+source .venv/bin/activate
 ```
 
 # Dependencies
