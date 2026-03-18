@@ -105,26 +105,27 @@ def add_events_to_calendars(events_from_google, calendar_name, calendars):
 
 def get_calendars(creds, filter):
     google_calendars = list_google_calendars(creds)
-    today = datetime.datetime.combine(
+    start_of_today = datetime.datetime.combine(
         datetime.date.today(), datetime.time.min, tzinfo=ZoneInfo(TIMEZONE)
     )
-    tomorrow = today + datetime.timedelta(days=1)
-    calendars = [CalendarDay(date=today.date()), CalendarDay(date=tomorrow.date())]
+    tomorrow = start_of_today + datetime.timedelta(days=1)
+    end_of_tomorrow = tomorrow + datetime.timedelta(days=1) - datetime.timedelta(seconds=1)
+    calendar_days = [CalendarDay(date=start_of_today.date()), CalendarDay(date=tomorrow.date())]
     for gcal in google_calendars:
         if gcal.id in filter:
             events = list_google_events(
                 creds,
                 gcal.id,
-                today,
-                tomorrow + datetime.timedelta(days=1) - datetime.timedelta(seconds=1),
+                start_of_today,
+                end_of_tomorrow,
             )
-            add_events_to_calendars(events, filter[gcal.id], calendars)
+            add_events_to_calendars(events, filter[gcal.id], calendar_days)
         else:
             print(f"skipping id: {gcal.id} name: {gcal.name}")
-    for cal in calendars:
+    for cal in calendar_days:
         cal.whole_day_events.sort(key=attrgetter("summary"))
         cal.timed_events.sort(key=attrgetter("start_time"))
-    return calendars
+    return calendar_days
 
 
 def test_data():
