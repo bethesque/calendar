@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Make this work on mac and on the raspberry pi. Not sure why/if it needs the absolute path, but don't want to mess with it.
-if [[ -x "/usr/bin/python" ]]; then
+if [ -x "/usr/bin/python" ]; then
     echo "/usr/bin/python exists and is executable."
     PYTH="/usr/bin/python"
 else
@@ -9,7 +9,7 @@ else
     PYTH="python"
 fi
 
-if [[ -f /tmp/force.txt ]]; then
+if [ -f /tmp/force.txt ]; then
 	# Force re-render of the image
 	rm -rf /tmp/force.txt
 	echo "Executing main with --force"
