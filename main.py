@@ -6,8 +6,10 @@ from qr import make_qr_code
 from datetime import datetime, date
 import json
 import dataclasses
-from env import filter, SERVER_ADDRESS
+from env import filter, SERVER_ADDRESS, DATA_DIRECTORY, IS_LOCAL
+import sys
 
+DATA_FILE = DATA_DIRECTORY + "/ecalendar-last-render.json"
 
 def json_default_encoder(o):
     if isinstance(o, (date, datetime)):
@@ -41,35 +43,34 @@ def local_render(image):
     image.show("test")
 
 
-def load_image(calendar_source, surface):
+def load_image(calendar_source, surface, force):
     last_render = None
     try:
-        with open("/tmp/ecalendar-last-render.json") as f:
+        with open(DATA_FILE) as f:
             last_render = f.read()
     except:
         pass
     creds = calendar_source.load_creds()
     if not creds or not creds.valid:
-        with open("/tmp/ecalendar-last-render.json", "w") as f:
+        with open(DATA_FILE, "w") as f:
             f.write('["credentials"]')
         if last_render == '["credentials"]':
             return
+        print("unable to load creds, rendering qr code for re-auth")
         return make_qr_code(SERVER_ADDRESS, surface)
     else:
         calendars = calendar_source.load_data(creds, filter)
         data_json = json.dumps(calendars, sort_keys=True, default=json_default_encoder)
-        if last_render == data_json and not Path("/tmp/force.txt").is_file():
+        if last_render == data_json and not force:
             return
-
-        Path("/tmp/force.txt").unlink(missing_ok=True)
-        with open("/tmp/ecalendar-last-render.json", "w") as f:
+        with open(DATA_FILE, "w") as f:
             f.write(data_json)
         return layout_calendars(calendars, surface)
 
 
-def run(render, load_creds, width, height):
+def run(render, load_creds, width, height, force):
     surface = Surface(0, 0, width, height)
-    image = load_image(load_creds, surface)
+    image = load_image(load_creds, surface, force)
     if image is None:
         print("no update")
     else:
@@ -78,6 +79,10 @@ def run(render, load_creds, width, height):
 
 
 if __name__ == "__main__":
-    print("running: " + datetime.now().isoformat())
-    # run(hardware_render, CalendarSource(stubbed=False), 1304, 984)
-    run(local_render, CalendarSource(stubbed=True), 1304, 984)
+    force = (len(sys.argv) > 1 and sys.argv[1] == "--force")
+    print("running: " + datetime.now().isoformat() + " force=" + str(force), flush=True)
+    if IS_LOCAL:
+        run(local_render, CalendarSource(stubbed=True), 1304, 984, force)
+    else:
+        run(hardware_render, CalendarSource(stubbed=False), 1304, 984, force)
+
