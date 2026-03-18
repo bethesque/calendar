@@ -69,6 +69,7 @@ Schedule the main screen update for hourly with:
 
 ```
 0 * * * * cd /home/thetrav/calendar && ./main.sh
+* * * * * cd /home/thetrav/calendar && ./main-force.sh
 @reboot /usr/bin/touch /tmp/force.txt
 ```
 
