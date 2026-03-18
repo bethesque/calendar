@@ -63,6 +63,7 @@ Schedule the main screen update for hourly with:
 
 ```
 0 * * * * cd /home/thetrav/calendar && /usr/bin/python /home/thetrav/calendar/main.py >> /home/thetrav/calendar/log.txt
+@reboot /usr/bin/touch /tmp/force.txt
 ```
 
 ## web server

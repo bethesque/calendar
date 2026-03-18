@@ -1,4 +1,5 @@
 from google_calendar import CalendarSource
+from pathlib import Path
 from layout import layout_calendars
 from model import Surface
 from qr import make_qr_code
@@ -57,8 +58,10 @@ def load_image(calendar_source, surface):
     else:
         calendars = calendar_source.load_data(creds, filter)
         data_json = json.dumps(calendars, sort_keys=True, default=json_default_encoder)
-        if last_render == data_json:
+        if last_render == data_json and not Path("/tmp/force.txt").is_file():
             return
+
+        Path("/tmp/force.txt").unlink(missing_ok=True)
         with open("/tmp/ecalendar-last-render.json", "w") as f:
             f.write(data_json)
         return layout_calendars(calendars, surface)
