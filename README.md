@@ -68,9 +68,14 @@ Schedule the main screen update for hourly with:
 `crontab -e`
 
 ```
+# Force refresh on startup
+@reboot cd /home/thetrav/calendar && /usr/bin/python /home/thetrav/calendar/main.py --force >> /home/thetrav/calendar/log.txt
+
+# Lazy refresh once an hour if data has changed
 0 * * * * cd /home/thetrav/calendar && ./main.sh
-* * * * * cd /home/thetrav/calendar && ./main-force.sh
-@reboot /usr/bin/touch /tmp/force.txt
+
+# Force refresh once a minute if the token has been updated
+* * * * * cd /home/thetrav/calendar && ./main-update-screen-if-token-updated.sh
 ```
 
 ## web server

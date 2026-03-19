@@ -1,9 +1,7 @@
 import cherrypy
 import google_auth_oauthlib.flow
-from env import SERVER_ADDRESS, SCOPE, login_hint, FORCE_RELOAD_FLAG_FILE
+from env import SERVER_ADDRESS, SCOPE, login_hint
 from main import run, hardware_render
-from google_calendar import CalendarSource
-from pathlib import Path
 
 class CalendarWebServer(object):
     @cherrypy.expose
@@ -42,10 +40,7 @@ class CalendarWebServer(object):
         with open("token.json", "w") as text_file:
             print(flow.credentials.to_json(), file=text_file)
 
-
-        Path(FORCE_RELOAD_FLAG_FILE).touch()
-
-        return "Welcome back"
+        return "Welcome back. The calendar screen should update within a few minutes."
 
 
 if __name__ == "__main__":
