@@ -79,6 +79,7 @@ Schedule the main screen update for hourly with:
 ```
 
 ## web server
+
 I use nginx for https and python web server
 
 ```
@@ -92,14 +93,28 @@ I hit enter for all params except common name, where I enter the rasberry pi's i
 
 
 ## Python app server
+
 The server invokes a locally running cherryPi app which needs to be set up as service with:
 ```
-sudo vi /lib/systemd/system/epcal.service
+sudo cp /home/thetrav/calendar/epcal.service /lib/systemd/system/epcal.service
 ```
-enter contents of epcal.service then reload with:
+
+Reload with:
 
 ```
 sudo systemctl daemon-reload
+```
+
+Start service if it has stopped with
+
+```
+sudo systemctl restart epcal.service
+```
+
+View system logs using
+
+```
+journalctl -f
 ```
 
 ## Google Authentication
@@ -114,6 +129,6 @@ My solution was to set a subdomain to resolve to a private network IP which I've
 
 # Run without hardware
 
-While developing I run things locally, main.py contains a local and hardware rendering function, you can just switch which one you pass into the run function and everything else should work fine.
+While developing I run things locally, main.py contains a local and hardware rendering function. Set `IS_LOCAL = True` in your env.py file and it will print the screen to an image file and open it locally.
 
 I've also got a testData function for when I don't want to wait for a round trip from google or in case I want to test a hard-to-recreate data scenario.
