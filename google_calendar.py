@@ -28,6 +28,7 @@ class GoogleCalendar:
 class Event:
     owner: str
     summary: str
+    description: str
     start_time: datetime.time = None
     end_time: datetime.time = None
 
@@ -89,13 +90,13 @@ def list_google_events(creds, calendar_id, min, max):
 
 
 def add_events_to_calendars(events_from_google, calendar_name, calendars):
-    for event in events_from_google:
-        start = event["start"]
+    for event_dict in events_from_google:
+        start = event_dict["start"]
         start_date = start.get("date", start.get("dateTime"))
         date = datetime.datetime.fromisoformat(start_date).date()
         dest = next((c for c in calendars if c.date == date), None)
         if dest:
-            event = Event(owner=calendar_name, summary=event["summary"])
+            event = Event(owner=calendar_name, summary=event_dict["summary"], description=event_dict.get("description"))
             if "dateTime" in start:
                 event.start_time = datetime.datetime.fromisoformat(start["dateTime"])
                 dest.timed_events.append(event)
@@ -137,17 +138,18 @@ def test_data():
     calendars = [CalendarDay(date=today.date()), CalendarDay(date=tomorrow.date())]
     today = calendars[0]
     tomorrow = calendars[1]
-    today.whole_day_events.append(Event("Trav", "Working on calendar epaper thing"))
+    today.whole_day_events.append(Event("Trav", "Working on calendar epaper thing", "#red"))
     today.timed_events.append(
         Event(
             "Beth",
             "A very long summary that is going to take way more space than we have to fit in the calendar horizontally which will cause it to split across multiple lines",
+            None,
             datetime.datetime(2023, 11, 2, 11, 30, tzinfo=ZoneInfo(TIMEZONE)),
         )
     )
     event_time = datetime.datetime(2023, 11, 3, 9, tzinfo=ZoneInfo(TIMEZONE))
     for n in range(10):
-        tomorrow.timed_events.append(Event("B & T", f"fake event #{n}", event_time))
+        tomorrow.timed_events.append(Event("B & T", f"fake event #{n}", None, event_time))
         event_time = event_time + datetime.timedelta(minutes=30)
     return calendars
 

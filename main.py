@@ -6,7 +6,7 @@ from qr import make_qr_code
 from datetime import datetime, date
 import json
 import dataclasses
-from env import filter, SERVER_ADDRESS, DATA_DIRECTORY, IS_LOCAL
+from env import filter, SERVER_ADDRESS, DATA_DIRECTORY, IS_LOCAL, STUB_DATA
 import sys
 
 DATA_FILE = DATA_DIRECTORY + "/ecalendar-last-render.json"
@@ -83,12 +83,10 @@ def run(render, load_creds, width, height, force):
 
 if __name__ == "__main__":
     force = (len(sys.argv) > 1 and sys.argv[1] == "--force")
-    print("running: " + datetime.now().isoformat() + " force=" + str(force), flush=True)
-    if IS_LOCAL:
-        print("Rendering locally")
-        run(local_render, CalendarSource(stubbed=True), 1304, 984, force)
-    else:
-        print("Refreshing hardware screen")
-        run(hardware_render, CalendarSource(stubbed=False), 1304, 984, force)
-    print("finished")
+    print("running: " + datetime.now().isoformat() + " force=" + str(force) + " IS_LOCAL=" + str(IS_LOCAL) + " STUB_DATA=" + str(STUB_DATA), flush=True)
 
+    calendar_source = CalendarSource(stubbed=STUB_DATA)
+    renderer = local_render if IS_LOCAL else hardware_render
+
+    run(renderer, calendar_source, 1304, 984, force)
+    print("finished")
