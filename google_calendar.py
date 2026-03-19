@@ -119,6 +119,7 @@ def get_calendars(creds, filter):
                 start_of_today,
                 end_of_tomorrow,
             )
+            print(f"Adding events from id: {gcal.id} name: {gcal.name}")
             add_events_to_calendars(events, filter[gcal.id], calendar_days)
         else:
             print(f"skipping id: {gcal.id} name: {gcal.name}")
