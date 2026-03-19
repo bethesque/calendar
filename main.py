@@ -55,7 +55,7 @@ def load_image(calendar_source, surface, force):
         with open(DATA_FILE, "w") as f:
             f.write('["credentials"]')
         if last_render == '["credentials"]':
-            print("last_render == '["credentials"]' whatever that means")
+            print("last_render == '[credentials]' whatever that means")
             return
         print("unable to load creds, rendering qr code for re-auth")
         return make_qr_code(SERVER_ADDRESS, surface)
