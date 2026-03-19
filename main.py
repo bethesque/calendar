@@ -26,8 +26,8 @@ def hardware_render(image):
     try:
         epd = epd12in48b.EPD()
         epd.Init()
-        Redimage = Image.new("1", (epd12in48b.EPD_WIDTH, epd12in48b.EPD_HEIGHT), 255)
-        epd.display(image, Redimage)
+        RedImage = Image.new("1", (epd12in48b.EPD_WIDTH, epd12in48b.EPD_HEIGHT), 255)
+        epd.display(image, RedImage)
         epd.EPD_Sleep()
 
     except IOError as e:
@@ -89,4 +89,4 @@ if __name__ == "__main__":
     renderer = local_render if IS_LOCAL else hardware_render
 
     run(renderer, calendar_source, 1304, 984, force)
-    print("finished")
+    print("finished", flush=True)

@@ -15,7 +15,7 @@ LEFT_WIDTH = 70
 
 def layout_calendars(calendars: list[CalendarDay], surface):
     image = Image.new(
-        "RGB", (surface.right, surface.bottom), surface.BLACK
+        "RGB", (surface.right, surface.bottom), surface.RED
     )  # 255: clear the frame
     draw = ImageDraw.Draw(image)
     box = EqualChildrenBox(padding=5, stroke=0)
@@ -32,7 +32,7 @@ def layout_calendars(calendars: list[CalendarDay], surface):
         )
 
         for event in day.whole_day_events:
-            color = RED if event.description and "#red" in event.description else BLACK
+            #color = RED if event.description and "#red" in event.description else BLACK
 
             day_box.children.append(
                 RightStretchBox(
@@ -40,11 +40,11 @@ def layout_calendars(calendars: list[CalendarDay], surface):
                     margin=2,
                     left_width=LEFT_WIDTH,
                     left=Text(event.owner),
-                    right=Text(event.summary, font=summary_font, color=color),
+                    right=Text(event.summary, font=summary_font, color=RED),
                 )
             )
         for event in day.timed_events:
-            color = RED if event.description and "#red" in event.description else BLACK
+            #color = RED if event.description and "#red" in event.description else BLACK
 
             day_box.children.append(
                 RightStretchBox(
@@ -54,7 +54,7 @@ def layout_calendars(calendars: list[CalendarDay], surface):
                     left=Text(
                         f"{event.owner}\n{event.start_time.strftime('%I:%M %p')}"
                     ),
-                    right=Text(event.summary, font=summary_font, padding_top=4, color=color),
+                    right=Text(event.summary, font=summary_font, padding_top=4, color=RED),
                 )
             )
 
