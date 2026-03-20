@@ -2,9 +2,9 @@ from PIL import Image, ImageDraw, ImageFont
 from dataclasses import dataclass, field
 from model import Surface
 
-FONT_SIZE_H1 = 46
-FONT_SIZE_DEFAULT = 22
-FONT_SIZE_SUMMARY = 32
+FONT_SIZE_H1 = 48
+FONT_SIZE_DEFAULT = 24
+FONT_SIZE_SUMMARY = 34
 PADDING = 5
 LINE_SPACING = 8
 
