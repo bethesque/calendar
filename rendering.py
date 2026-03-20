@@ -2,10 +2,10 @@ from PIL import Image, ImageDraw, ImageFont
 from dataclasses import dataclass, field
 from model import Surface
 
-FONT_SIZE_H1 = 48
-FONT_SIZE_DEFAULT = 24
-FONT_SIZE_SUMMARY = 34
-PADDING = 5
+# FONT_SIZE_H1 = 50
+# FONT_SIZE_DEFAULT = 24
+# FONT_SIZE_SUMMARY = 36
+
 LINE_SPACING = 8
 
 BLACK = 0x000000  #   00  BGR
@@ -13,12 +13,27 @@ WHITE = 0xFFFFFF  #   01
 YELLOW = 0x00FFFF  #   10
 RED = 0x0000FF  #   11
 
+
+# DEFAULT_FONT_FILE = "Font.ttc"
+# BOLD_FONT_FILE = "Font.ttc"
+# FONT_SIZE_H1 = 48
+# FONT_SIZE_DEFAULT = 24
+# FONT_SIZE_SUMMARY = 36
+# PADDING = 5
+
+
 #DEFAULT_FONT_FILE = "DejaVuSansCondensed.ttf"
 #BOLD_FONT_FILE = "DejaVuSansCondensed-Bold.ttf"
 #DEFAULT_FONT_FILE = "RobotoCondensed-Regular.ttf"
 #BOLD_FONT_FILE = "RobotoCondensed-Bold.ttf"
+
 DEFAULT_FONT_FILE = "LiberationSansNarrow-Regular.ttf"
 BOLD_FONT_FILE = "LiberationSansNarrow-Bold.ttf"
+FONT_SIZE_H1 = 48
+FONT_SIZE_DEFAULT = 28
+FONT_SIZE_SUMMARY = 42
+PADDING = 8
+
 
 def borders(box) -> int:
     return box.margin * 2 + box.stroke * 2 + box.padding * 2
