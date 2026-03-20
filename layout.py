@@ -33,7 +33,7 @@ def layout_calendars(calendars: list[CalendarDay], surface):
 
         for event in day.whole_day_events:
             summary = "*** " + event.summary.upper() + " ***" if event.description and "#important" in event.description else event.summary
-            summary_font = important_font(size=FONT_SIZE_SUMMARY) if not event.recurring else default_summary_font
+            summary_font = important_font(size=FONT_SIZE_SUMMARY) if (not event.recurring or (event.description and "#important" in event.description)) else default_summary_font
 
 
             day_box.children.append(
@@ -47,7 +47,7 @@ def layout_calendars(calendars: list[CalendarDay], surface):
             )
         for event in day.timed_events:
             summary = "*** " + event.summary.upper() + " ***" if event.description and "#important" in event.description else event.summary
-            summary_font = important_font(size=FONT_SIZE_SUMMARY) if not event.recurring else default_summary_font
+            summary_font = important_font(size=FONT_SIZE_SUMMARY) if (not event.recurring or (event.description and "#important" in event.description)) else default_summary_font
 
             day_box.children.append(
                 RightStretchBox(
