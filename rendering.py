@@ -13,7 +13,8 @@ WHITE = 0xFFFFFF  #   01
 YELLOW = 0x00FFFF  #   10
 RED = 0x0000FF  #   11
 
-DEFAULT_FONT_FILE = "Font.ttc"
+DEFAULT_FONT_FILE = "DejaVuSansCondensed.ttf"
+BOLD_FONT_FILE = "DejaVuSansCondensed-Bold.ttf"
 
 
 def borders(box) -> int:
@@ -22,6 +23,12 @@ def borders(box) -> int:
 
 def font(file=DEFAULT_FONT_FILE, size=FONT_SIZE_DEFAULT):
     return ImageFont.truetype(file, size)
+
+def important_font(size=FONT_SIZE_DEFAULT):
+    return ImageFont.truetype(BOLD_FONT_FILE, size)
+
+def important_font(size=FONT_SIZE_DEFAULT):
+    return ImageFont.truetype(BOLD_FONT_FILE, size)    
 
 
 def find_break_index(line, font, pixel_width):

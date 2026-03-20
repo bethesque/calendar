@@ -31,6 +31,7 @@ class Event:
     description: str
     start_time: datetime.time = None
     end_time: datetime.time = None
+    recurring: bool = False
 
 
 @dataclass
@@ -96,7 +97,7 @@ def add_events_to_calendars(events_from_google, calendar_name, calendars):
         date = datetime.datetime.fromisoformat(start_date).date()
         dest = next((c for c in calendars if c.date == date), None)
         if dest:
-            event = Event(owner=calendar_name, summary=event_dict["summary"], description=event_dict.get("description"))
+            event = Event(owner=calendar_name, summary=event_dict["summary"], description=event_dict.get("description"), recurring=bool(event_dict.get("recurringEventId")))
             if "dateTime" in start:
                 event.start_time = datetime.datetime.fromisoformat(start["dateTime"])
                 dest.timed_events.append(event)
@@ -138,8 +139,9 @@ def test_data():
     calendars = [CalendarDay(date=today.date()), CalendarDay(date=tomorrow.date())]
     today = calendars[0]
     tomorrow = calendars[1]
-    today.whole_day_events.append(Event("Trav", "Working on calendar epaper thing", "#red"))
-    today.whole_day_events.append(Event("Trav", "Cupcake Day", "#important"))
+    today.whole_day_events.append(Event("Trav", "Working on calendar epaper thing", "Once off event"))
+    today.whole_day_events.append(Event("Trav", "Cupcake Day", "#important", recurring=True))
+    today.whole_day_events.append(Event("Trav", "A regular event", "", recurring=True))
     today.timed_events.append(
         Event(
             "Beth",
@@ -150,7 +152,7 @@ def test_data():
     )
     event_time = datetime.datetime(2023, 11, 3, 9, tzinfo=ZoneInfo(TIMEZONE))
     for n in range(10):
-        tomorrow.timed_events.append(Event("B & T", f"fake event #{n}", None, event_time))
+        tomorrow.timed_events.append(Event("B & T", f"fake event #{n}", None, event_time, recurring=True))
         event_time = event_time + datetime.timedelta(minutes=30)
     return calendars
 

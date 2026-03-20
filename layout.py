@@ -20,7 +20,7 @@ def layout_calendars(calendars: list[CalendarDay], surface):
     draw = ImageDraw.Draw(image)
     box = EqualChildrenBox(padding=5, stroke=0)
     h1_font = font(size=FONT_SIZE_H1)
-    summary_font = font(size=FONT_SIZE_SUMMARY)
+    default_summary_font = font(size=FONT_SIZE_SUMMARY)
     for day in calendars:
         day_box = StackChildrenBox(padding=5, stroke=0, horizontal=False)
         day_box.children.append(
@@ -33,6 +33,8 @@ def layout_calendars(calendars: list[CalendarDay], surface):
 
         for event in day.whole_day_events:
             summary = "*** " + event.summary.upper() + " ***" if event.description and "#important" in event.description else event.summary
+            summary_font = important_font(size=FONT_SIZE_SUMMARY) if not event.recurring else default_summary_font
+
 
             day_box.children.append(
                 RightStretchBox(
@@ -45,6 +47,7 @@ def layout_calendars(calendars: list[CalendarDay], surface):
             )
         for event in day.timed_events:
             summary = "*** " + event.summary.upper() + " ***" if event.description and "#important" in event.description else event.summary
+            summary_font = important_font(size=FONT_SIZE_SUMMARY) if not event.recurring else default_summary_font
 
             day_box.children.append(
                 RightStretchBox(
