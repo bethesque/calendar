@@ -139,6 +139,7 @@ def test_data():
     today = calendars[0]
     tomorrow = calendars[1]
     today.whole_day_events.append(Event("Trav", "Working on calendar epaper thing", "#red"))
+    today.whole_day_events.append(Event("Trav", "Cupcake Day", "#important"))
     today.timed_events.append(
         Event(
             "Beth",
