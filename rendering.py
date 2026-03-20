@@ -13,9 +13,10 @@ WHITE = 0xFFFFFF  #   01
 YELLOW = 0x00FFFF  #   10
 RED = 0x0000FF  #   11
 
-DEFAULT_FONT_FILE = "DejaVuSansCondensed.ttf"
-BOLD_FONT_FILE = "DejaVuSansCondensed-Bold.ttf"
-
+#DEFAULT_FONT_FILE = "DejaVuSansCondensed.ttf"
+#BOLD_FONT_FILE = "DejaVuSansCondensed-Bold.ttf"
+DEFAULT_FONT_FILE = "RobotoCondensed-Regular.ttf"
+BOLD_FONT_FILE = "RobotoCondensed-Bold.ttf"
 
 def borders(box) -> int:
     return box.margin * 2 + box.stroke * 2 + box.padding * 2
