@@ -140,8 +140,10 @@ def test_data():
     today = calendars[0]
     tomorrow = calendars[1]
     today.whole_day_events.append(Event("Trav", "Working on calendar epaper thing", "Once off event"))
-    today.whole_day_events.append(Event("Trav", "Cupcake Day", "#important", recurring=True))
-    today.whole_day_events.append(Event("Trav", "A regular event", "", recurring=True))
+    today.whole_day_events.append(Event("Trav", "A very important event", "#veryimportant", recurring=True))
+    today.whole_day_events.append(Event("Trav", "A normal recurring event", "", recurring=True))
+    today.whole_day_events.append(Event("Trav", "An important recurring event", "#important", recurring=True))
+    today.whole_day_events.append(Event("Beth", "A once off unimportant event", "#notimportant", recurring=True))
     today.timed_events.append(
         Event(
             "Beth",

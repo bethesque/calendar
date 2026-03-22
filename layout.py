@@ -10,7 +10,7 @@ weekdays = [
     "Saturday",
     "Sunday",
 ]
-LEFT_WIDTH = 70
+LEFT_WIDTH = 75
 
 
 def layout_calendars(calendars: list[CalendarDay], surface):
@@ -20,7 +20,8 @@ def layout_calendars(calendars: list[CalendarDay], surface):
     draw = ImageDraw.Draw(image)
     box = EqualChildrenBox(padding=5, stroke=0)
     h1_font = font(size=FONT_SIZE_H1)
-    default_summary_font = font(size=FONT_SIZE_SUMMARY)
+    
+
     for day in calendars:
         day_box = StackChildrenBox(padding=5, stroke=0, horizontal=False)
         day_box.children.append(
@@ -32,9 +33,8 @@ def layout_calendars(calendars: list[CalendarDay], surface):
         )
 
         for event in day.whole_day_events:
-            summary = "*** " + event.summary.upper() + " ***" if event.description and "#important" in event.description else event.summary
-            summary_font = important_font(size=FONT_SIZE_SUMMARY) if (not event.recurring or (event.description and "#important" in event.description)) else default_summary_font
-
+            summary = extract_summary(event)
+            summary_font = decide_summary_font(event)
 
             day_box.children.append(
                 RightStretchBox(
@@ -46,8 +46,8 @@ def layout_calendars(calendars: list[CalendarDay], surface):
                 )
             )
         for event in day.timed_events:
-            summary = "*** " + event.summary.upper() + " ***" if event.description and "#important" in event.description else event.summary
-            summary_font = important_font(size=FONT_SIZE_SUMMARY) if (not event.recurring or (event.description and "#important" in event.description)) else default_summary_font
+            summary = extract_summary(event)
+            summary_font = decide_summary_font(event)
 
             day_box.children.append(
                 RightStretchBox(
@@ -81,3 +81,11 @@ def layout_calendars(calendars: list[CalendarDay], surface):
     # draw.arc((5, 250, 80, 325), 0, 360, fill = surface.BLACK)
     # draw.chord((90, 250, 165, 325), 0, 360, fill = surface.RED)
     return image
+
+
+def extract_summary(event):
+    return "*** " + event.summary.upper() + " ***" if event.description and "#veryimportant" in event.description else event.summary
+
+def decide_summary_font(event):
+    important = (event.description and "#important" in event.description) or (event.description and "#veryimportant" in event.description) or (not event.recurring and (event.description is None or not "#notimportant" in event.description))
+    return important_font(size=FONT_SIZE_SUMMARY) if important else font(size=FONT_SIZE_SUMMARY)

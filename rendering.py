@@ -103,6 +103,10 @@ class Text:
             fill=self.color,
         )
 
+    """
+    width: number
+        The width allowed for the text box
+    """
     def wrapped_text(self, width):
         if self._wrapped_text != "":
             return self._wrapped_text
