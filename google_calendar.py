@@ -34,11 +34,16 @@ class Event:
     recurring: bool = False
 
 
+# A day displayed on the calendar screen
 @dataclass
 class CalendarDay:
     date: datetime.date
     whole_day_events: list[Event] = field(default_factory=list)
     timed_events: list[Event] = field(default_factory=list)
+    date_time: datetime.datetime = None
+
+    def __post_init__(self):
+        self.date_time = datetime.datetime.combine(self.date, datetime.time.min, tzinfo=ZoneInfo(TIMEZONE))
 
 
 def load_google_creds():
@@ -90,19 +95,41 @@ def list_google_events(creds, calendar_id, min, max):
         return []
 
 
-def add_events_to_calendars(events_from_google, calendar_name, calendars):
+def add_events_to_calendars(events_from_google, calendar_name, displayed_calendar_days):
     for event_dict in events_from_google:
-        start = event_dict["start"]
-        start_date = start.get("date", start.get("dateTime"))
-        date = datetime.datetime.fromisoformat(start_date).date()
-        dest = next((c for c in calendars if c.date == date), None)
-        if dest:
+        
+        matched_days = [d for d in displayed_calendar_days if displayed_day_includes_event(d, event_dict)]
+
+        for matched_day in matched_days:
             event = Event(owner=calendar_name, summary=event_dict["summary"], description=event_dict.get("description"), recurring=bool(event_dict.get("recurringEventId")))
-            if "dateTime" in start:
-                event.start_time = datetime.datetime.fromisoformat(start["dateTime"])
-                dest.timed_events.append(event)
+            if "dateTime" in event_dict["start"]: # has a time specified
+                event.start_time = datetime.datetime.fromisoformat(event_dict["start"]["dateTime"])
+                matched_day.timed_events.append(event)
             else:
-                dest.whole_day_events.append(event)
+                matched_day.whole_day_events.append(event)
+
+"""
+Returns true if the event described by the properties in the event_dict falls on the date
+of the given displayed CalendarDay.
+
+Properties:
+
+event_dict: dict
+    The Google Calendar event dict.
+"""
+def displayed_day_includes_event(displayed_calendar_day, event_dict):
+    start = event_dict["start"] # dict with either "date" or "dateTime" as a string
+    start_date_text = start.get("date", start.get("dateTime"))
+    start_date = datetime.datetime.fromisoformat(start_date_text).date()
+
+    end = event_dict["end"] # dict with either "date" or "dateTime" as a string
+    end_date_text = end.get("date", end.get("dateTime"))
+    end_date_time = datetime.datetime.fromisoformat(end_date_text)
+
+    if end_date_time.tzinfo is None:
+        end_date_time = end_date_time.replace(tzinfo=ZoneInfo(TIMEZONE))
+
+    return displayed_calendar_day.date == start_date or ( start_date < displayed_calendar_day.date and displayed_calendar_day.date_time < end_date_time )     
 
 
 def get_calendars(creds, filter):
@@ -112,7 +139,7 @@ def get_calendars(creds, filter):
     )
     tomorrow = start_of_today + datetime.timedelta(days=1)
     end_of_tomorrow = tomorrow + datetime.timedelta(days=1) - datetime.timedelta(seconds=1)
-    calendar_days = [CalendarDay(date=start_of_today.date()), CalendarDay(date=tomorrow.date())]
+    displayed_calendar_days = [CalendarDay(date=start_of_today.date()), CalendarDay(date=tomorrow.date())]
     for gcal in google_calendars:
         if gcal.id in filter:
             events = list_google_events(
@@ -122,13 +149,13 @@ def get_calendars(creds, filter):
                 end_of_tomorrow,
             )
             print(f"Adding events from id: {gcal.id} name: {gcal.name}")
-            add_events_to_calendars(events, filter[gcal.id], calendar_days)
+            add_events_to_calendars(events, filter[gcal.id], displayed_calendar_days)
         else:
             print(f"skipping id: {gcal.id} name: {gcal.name}")
-    for cal in calendar_days:
-        cal.whole_day_events.sort(key=attrgetter("summary"))
+    for cal in displayed_calendar_days:
+        #cal.whole_day_events.sort(key=attrgetter("summary"))
         cal.timed_events.sort(key=attrgetter("start_time"))
-    return calendar_days
+    return displayed_calendar_days
 
 
 def test_data():
