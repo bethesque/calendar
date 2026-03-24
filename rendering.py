@@ -96,6 +96,11 @@ class Text:
 
     def render(self, draw: ImageDraw, surface: Surface):
         text = self.wrapped_text(surface.right - surface.left)
+
+        # Debugging - make the background of the text yellow
+        # bbox = draw.multiline_textbbox((surface.left, surface.top + self.padding_top), text, font=self.font)
+        # draw.rectangle(bbox, fill="yellow")
+
         draw.text(
             (surface.left, surface.top + self.padding_top),
             text,
@@ -104,6 +109,8 @@ class Text:
         )
 
     """
+    Sets the wrapped_text which is then cached for use in the render method. Suspect this shouldn't be cached.
+
     width: number
         The width allowed for the text box
     """
@@ -117,9 +124,11 @@ class Text:
         return self._wrapped_text
 
     def height(self, width: int):
-        _, _, _, height = self.font.getbbox(self.text)
+        _, _, _, height = self.font.getbbox(self.text.split('\n', 1)[0])
+
         lines = len(self.wrapped_text(width).split("\n"))
-        h = lines * (height + LINE_SPACING)
+        print(self.text + " height " + str(height) + " line count " + str(lines))
+        h = (lines * (height + LINE_SPACING)) - LINE_SPACING
 
         return h
 
@@ -177,6 +186,7 @@ class RightStretchBox:
     left_width: int = 0
     right: object = None
 
+    # I think this is not quite right because there's always a bit of extra padding at the bottom of the boxes.
     def height(self, width):
         return max(
             self.left.height(self.left_width - borders(self) / 2),
