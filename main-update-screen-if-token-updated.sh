@@ -14,7 +14,7 @@ if [ -f token.json ] && { [ ! -f ecalendar-last-render.json ] || [ token.json -n
   fi
 
   echo "Executing main with --force"
-  "$PYTH" main.py --force >> log.txt
+  "$PYTH" main.py --force
 else
   echo "calendar rendered more recently than tokens fetched"
 fi

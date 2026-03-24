@@ -13,4 +13,4 @@ fi
 
 echo "Executing main"
 # Allow use of cached image
-"$PYTH" main.py >> log.txt
+"$PYTH" main.py
