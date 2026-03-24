@@ -5,6 +5,7 @@ from zoneinfo import ZoneInfo
 import os.path
 from dataclasses import dataclass, field
 from operator import attrgetter
+import logging
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -16,6 +17,8 @@ from googleapiclient.errors import HttpError
 # If modifying these scopes, delete the file token.json.
 SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
 TIMEZONE = "Australia/Melbourne"
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -70,7 +73,7 @@ def list_google_calendars(creds):
         result = service.calendarList().list().execute()
         return [GoogleCalendar(c["id"], c["summary"]) for c in result.get("items", [])]
     except HttpError as error:
-        print(f"An error occurred: {error}")
+        logger.error(f"An error occurred: {error}")
         return []
 
 
@@ -91,7 +94,7 @@ def list_google_events(creds, calendar_id, min, max):
         return events_result.get("items", [])
 
     except HttpError as error:
-        print("An error occurred: %s" % error)
+        logger.info("An error occurred: %s" % error)
         return []
 
 
@@ -148,10 +151,10 @@ def get_calendars(creds, filter):
                 start_of_today,
                 end_of_tomorrow,
             )
-            print(f"Adding events from id: {gcal.id} name: {gcal.name}")
+            logger.info(f"Adding events from id: {gcal.id} name: {gcal.name}")
             add_events_to_calendars(events, filter[gcal.id], displayed_calendar_days)
         else:
-            print(f"skipping id: {gcal.id} name: {gcal.name}")
+            logger.info(f"skipping id: {gcal.id} name: {gcal.name}")
     for cal in displayed_calendar_days:
         #cal.whole_day_events.sort(key=attrgetter("summary"))
         cal.timed_events.sort(key=attrgetter("start_time"))
