@@ -10,7 +10,7 @@ weekdays = [
     "Saturday",
     "Sunday",
 ]
-LEFT_WIDTH = 80
+LEFT_WIDTH = 90
 
 
 def layout_calendars(calendars: list[CalendarDay], surface):
