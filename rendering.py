@@ -127,7 +127,6 @@ class Text:
         _, _, _, height = self.font.getbbox(self.text.split('\n', 1)[0])
 
         lines = len(self.wrapped_text(width).split("\n"))
-        print(self.text + " height " + str(height) + " line count " + str(lines))
         h = (lines * (height + LINE_SPACING)) - LINE_SPACING
 
         return h
