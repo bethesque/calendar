@@ -1,7 +1,6 @@
 import cherrypy
 import google_auth_oauthlib.flow
 from env import SERVER_ADDRESS, SCOPE, login_hint
-from main import run, hardware_render
 
 class CalendarWebServer(object):
     @cherrypy.expose
