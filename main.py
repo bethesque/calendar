@@ -30,12 +30,14 @@ def hardware_render(image):
     from PIL import Image
 
     try:
+        start = time.perf_counter()
         epd = epd12in48b.EPD()
         epd.Init()
         RedImage = Image.new("1", (epd12in48b.EPD_WIDTH, epd12in48b.EPD_HEIGHT), 255)
         epd.display(image, RedImage)
         epd.EPD_Sleep()
-
+        end = time.perf_counter()
+        logger.info("hardware_render time: %.3f seconds", end - start)
     except IOError as e:
         logger.error(f"error: {e}")
 
