@@ -32,10 +32,15 @@ def hardware_render(image):
 
     try:
         start = time.perf_counter()
+        logger.info("epd12in48b.EPD()")
         epd = epd12in48b.EPD()
+        logger.info("epd.Init()")
         epd.Init()
+        logger.info("Making new red image")
         RedImage = Image.new("1", (epd12in48b.EPD_WIDTH, epd12in48b.EPD_HEIGHT), 255)
+        logger.info("epd.display(image, RedImage)")
         epd.display(image, RedImage)
+        logger.info("epd.EPD_Sleep()")
         epd.EPD_Sleep()
         end = time.perf_counter()
         logger.info("hardware_render time: %.3f seconds", end - start)
