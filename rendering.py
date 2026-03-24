@@ -123,13 +123,9 @@ class Text:
         self._wrapped_text = "\n".join(lines)
         return self._wrapped_text
 
-    def height(self, width: int):
-        _, _, _, height = self.font.getbbox(self.text.split('\n', 1)[0])
-
-        lines = len(self.wrapped_text(width).split("\n"))
-        h = (lines * (height + LINE_SPACING)) - LINE_SPACING
-
-        return h
+    def height(self, width: int, draw: ImageDraw):
+        _, _, _, bbox_height = draw.multiline_textbbox((0, 0), self.wrapped_text(width), font=self.font, spacing=LINE_SPACING)
+        return bbox_height
 
 
 @dataclass
@@ -162,7 +158,7 @@ class StackChildrenBox:
             cl = l + m + p
             cr = r - m - p
             cw = cr - cl
-            ch = child.height(cw)
+            ch = child.height(cw, draw)
             cb = t + ch
             if cb > b:
                 cb = b
@@ -186,10 +182,10 @@ class RightStretchBox:
     right: object = None
 
     # I think this is not quite right because there's always a bit of extra padding at the bottom of the boxes.
-    def height(self, width):
+    def height(self, width, draw):
         return max(
-            self.left.height(self.left_width - borders(self) / 2),
-            self.right.height(width - self.left_width - borders(self) / 2),
+            self.left.height(self.left_width - borders(self) / 2, draw),
+            self.right.height(width - self.left_width - borders(self) / 2, draw),
         ) + borders(self)
 
     def render(self, draw: ImageDraw, surface: Surface):
@@ -211,7 +207,7 @@ class RightStretchBox:
         cl = l + m + p
         cr = cl + self.left_width
         ct = t + m + p
-        cb = self.height(w)
+        cb = self.height(w, draw)
         cs = Surface(top=ct, left=cl, right=cr, bottom=cb)
         self.left.render(draw, cs)
         cl = cr
@@ -299,10 +295,11 @@ class SingleChildBox:
         cs = Surface(top=ct, left=cl, right=cr, bottom=cb)
         child.render(draw, cs)
 
-    def height(self, width: int):
+    def height(self, width: int, draw: ImageDraw):
         return (
             self.child.height(
-                width - (self.margin * 2) - (self.padding * 2) - (self.stroke * 2)
+                width - (self.margin * 2) - (self.padding * 2) - (self.stroke * 2),
+                draw
             )
             + self.margin * 2
             + self.padding * 2
