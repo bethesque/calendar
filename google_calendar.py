@@ -137,14 +137,17 @@ def displayed_day_includes_event(displayed_calendar_day, event_dict):
 
 def get_calendars(creds, filter):
     google_calendars = list_google_calendars(creds)
+    google_calendars_by_id = {calendar.id: calendar for calendar in google_calendars}
     start_of_today = datetime.datetime.combine(
         datetime.date.today(), datetime.time.min, tzinfo=ZoneInfo(TIMEZONE)
     )
     tomorrow = start_of_today + datetime.timedelta(days=1)
     end_of_tomorrow = tomorrow + datetime.timedelta(days=1) - datetime.timedelta(seconds=1)
     displayed_calendar_days = [CalendarDay(date=start_of_today.date()), CalendarDay(date=tomorrow.date())]
-    for gcal in google_calendars:
-        if gcal.id in filter:
+    
+    for cal_id, display_name in filter:
+        gcal = google_calendars_by_id[cal_id]
+        if gcal:
             events = list_google_events(
                 creds,
                 gcal.id,
@@ -152,11 +155,9 @@ def get_calendars(creds, filter):
                 end_of_tomorrow,
             )
             logger.info(f"Adding events from id: {gcal.id} name: {gcal.name}")
-            add_events_to_calendars(events, filter[gcal.id], displayed_calendar_days)
-        else:
-            logger.info(f"skipping id: {gcal.id} name: {gcal.name}")
+            add_events_to_calendars(events, display_name, displayed_calendar_days)
+
     for cal in displayed_calendar_days:
-        #cal.whole_day_events.sort(key=attrgetter("summary"))
         cal.timed_events.sort(key=attrgetter("start_time"))
     return displayed_calendar_days
 
