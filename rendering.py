@@ -82,8 +82,8 @@ def split_line(lines, line, font, pixel_width):
         lines.append(line)
         return
     break_index = find_break_index(line, font, pixel_width)
-    lines.append(line[:break_index])
-    split_line(lines, line[break_index:], font, pixel_width)
+    lines.append(line[:break_index].strip())
+    split_line(lines, line[break_index:].strip(), font, pixel_width)
 
 
 @dataclass
