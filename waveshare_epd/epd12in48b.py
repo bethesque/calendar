@@ -171,7 +171,7 @@ class EPD(object):
         red = RedImage.convert("1")
         Redbuf = list(red.tobytes())
 
-        Redbuf_inv = Redbuf
+        Redbuf_inv = [~b & 0xFF for b in Redbuf]
 
         logger.info("red buffer done")
 
