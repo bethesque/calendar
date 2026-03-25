@@ -413,6 +413,30 @@ class EPD(object):
         epdconfig.spi_writebyte(val)
         epdconfig.digital_write(self.EPD_S1_CS_PIN, 1)
 
+    def S2_SendData2(self, data):
+        epdconfig.digital_write(self.EPD_M2S2_DC_PIN, 1)
+        epdconfig.digital_write(self.EPD_S2_CS_PIN, 0)
+        epdconfig.spi_writebyte2(data)
+        epdconfig.digital_write(self.EPD_S2_CS_PIN, 1)
+
+    def M2_SendData2(self, data):
+        epdconfig.digital_write(self.EPD_M2S2_DC_PIN, 1)
+        epdconfig.digital_write(self.EPD_M2_CS_PIN, 0)
+        epdconfig.spi_writebyte2(data)
+        epdconfig.digital_write(self.EPD_M2_CS_PIN, 1)
+
+    def M1_SendData2(self, data):
+        epdconfig.digital_write(self.EPD_M1S1_DC_PIN, 1)
+        epdconfig.digital_write(self.EPD_M1_CS_PIN, 0)
+        epdconfig.spi_writebyte2(data)
+        epdconfig.digital_write(self.EPD_M1_CS_PIN, 1)
+
+    def S1_SendData2(self, data):
+        epdconfig.digital_write(self.EPD_M1S1_DC_PIN, 1)
+        epdconfig.digital_write(self.EPD_S1_CS_PIN, 0)
+        epdconfig.spi_writebyte2(data)
+        epdconfig.digital_write(self.EPD_S1_CS_PIN, 1)      
+
     """   M1 Write register address and data     """
 
     def M1_SendCommand(self, cmd):
