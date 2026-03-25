@@ -95,6 +95,6 @@ def is_important(event):
     marked_very_important = event.description and "#veryimportant" in event.description
     marked_not_important = event.description and "#notimportant" in event.description
     once_off_event = not event.recurring
-    is_weather = event.summary.startswith("Min") or event.summary.startswith("Max")
+    is_weather = event.summary.startswith("Min ") or event.summary.startswith("Max ")
 
     return marked_important or marked_very_important or (once_off_event and not marked_not_important and not is_weather)

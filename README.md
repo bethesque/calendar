@@ -76,6 +76,9 @@ Schedule the main screen update for hourly with:
 
 # Force refresh once a minute if the token has been updated
 * * * * * cd /home/thetrav/calendar && ./main-update-screen-if-token-updated.sh
+
+# Stop the log file getting too big - at 2am on a Sunday, get rid of all but the last 500 lines
+0 2 * * 0 [ -f /home/thetrav/calendar/log.txt ] && /usr/bin/tail -n 500 /home/thetrav/calendar/log.txt > /home/thetrav/calendar/log.tmp && /bin/mv /home/thetrav/calendar/log.tmp /home/thetrav/calendar/log.txt
 ```
 
 ## web server
