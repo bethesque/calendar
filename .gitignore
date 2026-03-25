@@ -8,3 +8,4 @@ log.txt
 bin
 lib
 ecalendar-last-render.json
+pyvenv.cfg
