@@ -87,5 +87,14 @@ def extract_summary(event):
     return "*** " + event.summary.upper() + " ***" if event.description and "#veryimportant" in event.description else event.summary
 
 def decide_summary_font(event):
-    important = (event.description and "#important" in event.description) or (event.description and "#veryimportant" in event.description) or (not event.recurring and (event.description is None or not "#notimportant" in event.description))
-    return important_font(size=FONT_SIZE_SUMMARY) if important else font(size=FONT_SIZE_SUMMARY)
+    return important_font(size=FONT_SIZE_SUMMARY - 1) if is_important(event) else font(size=FONT_SIZE_SUMMARY)
+
+
+def is_important(event):
+    marked_important = event.description and "#important" in event.description
+    marked_very_important = event.description and "#veryimportant" in event.description
+    marked_not_important = event.description and "#notimportant" in event.description
+    once_off_event = not event.recurring
+    is_weather = event.summary.startswith("Min") or event.summary.startswith("Max")
+
+    return marked_important or marked_very_important or (once_off_event and not marked_not_important and not is_weather)
