@@ -170,7 +170,6 @@ class EPD(object):
         logger.info("Building red buffer")
         red = RedImage.convert("1")
         Redbuf = list(red.tobytes())
-        logger.info("red buffer done")
 
         Redbuf_inv = [~b & 0xFF for b in Redbuf]
 
@@ -413,46 +412,88 @@ class EPD(object):
         epdconfig.spi_writebyte(val)
         epdconfig.digital_write(self.EPD_M1_CS_PIN, 1)
 
-    # Busy
     def M1_ReadBusy(self):
+        start = time.time()
+        last_log = start
+
         self.M1_SendCommand(0x71)
         busy = epdconfig.digital_read(self.EPD_M1_BUSY_PIN)
         busy = not (busy & 0x01)
+
         while busy:
+            now = time.time()
+            if now - last_log >= 10:
+                logger.info("M1 busy... %.1f seconds elapsed", now - start)
+                last_log = now
+
             self.M1_SendCommand(0x71)
             busy = epdconfig.digital_read(self.EPD_M1_BUSY_PIN)
             busy = not (busy & 0x01)
+
+        logger.info("M1 ready after %.1f seconds", time.time() - start)
         time.sleep(0.2)
 
     def M2_ReadBusy(self):
+        start = time.time()
+        last_log = start
+
         self.M2_SendCommand(0x71)
         busy = epdconfig.digital_read(self.EPD_M2_BUSY_PIN)
         busy = not (busy & 0x01)
-        self.M2_SendCommand(0x71)
+
         while busy:
+            now = time.time()
+            if now - last_log >= 10:
+                logger.info("M2 busy... %.1f seconds elapsed", now - start)
+                last_log = now
+
             self.M2_SendCommand(0x71)
             busy = epdconfig.digital_read(self.EPD_M2_BUSY_PIN)
             busy = not (busy & 0x01)
+
+        logger.info("M2 ready after %.1f seconds", time.time() - start)
         time.sleep(0.2)
 
     def S1_ReadBusy(self):
+        start = time.time()
+        last_log = start
+
         self.S1_SendCommand(0x71)
         busy = epdconfig.digital_read(self.EPD_S1_BUSY_PIN)
         busy = not (busy & 0x01)
+
         while busy:
+            now = time.time()
+            if now - last_log >= 10:
+                logger.info("S1 busy... %.1f seconds elapsed", now - start)
+                last_log = now
+
             self.S1_SendCommand(0x71)
             busy = epdconfig.digital_read(self.EPD_S1_BUSY_PIN)
             busy = not (busy & 0x01)
+
+        logger.info("S1 ready after %.1f seconds", time.time() - start)
         time.sleep(0.2)
 
     def S2_ReadBusy(self):
+        start = time.time()
+        last_log = start
+
         self.S2_SendCommand(0x71)
         busy = epdconfig.digital_read(self.EPD_S2_BUSY_PIN)
         busy = not (busy & 0x01)
+
         while busy:
+            now = time.time()
+            if now - last_log >= 10:
+                logger.info("S2 busy... %.1f seconds elapsed", now - start)
+                last_log = now
+
             self.S2_SendCommand(0x71)
             busy = epdconfig.digital_read(self.EPD_S2_BUSY_PIN)
             busy = not (busy & 0x01)
+
+        logger.info("S2 ready after %.1f seconds", time.time() - start)
         time.sleep(0.2)
 
     lut_vcom1 = [
