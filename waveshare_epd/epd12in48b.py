@@ -29,6 +29,10 @@
 import time
 from . import epdconfig
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 EPD_WIDTH = 1304
 EPD_HEIGHT = 984
 
@@ -153,79 +157,92 @@ class EPD(object):
     def display(self, BlackImage, RedImage):
         start = time.perf_counter()
 
-        Blackbuf = [0x00] * int(self.width * self.height / 8)
-        blackconvert = BlackImage.convert("1")
-        bimwidth, bimheight = blackconvert.size
-        Blackpixles = blackconvert.load()
-        temp = 0
-        for y in range(0, bimheight):
-            for x in range(0, bimwidth):
-                if Blackpixles[x, y] < 127:  # black
-                    Blackbuf[int((x + y * self.width) / 8)] &= ~(0x80 >> temp)
-                else:  # white
-                    Blackbuf[int((x + y * self.width) / 8)] |= 0x80 >> temp
-                temp = temp + 1
-                if temp == 8:
-                    temp = 0
+        width = self.width
+        height = self.height
+        bytes_per_row = width // 8  # 163
 
-        Redbuf = [0x00] * int(self.width * self.height / 8)
-        redconvert = RedImage.convert("1")
-        rimwidth, rimheight = redconvert.size
-        Redpixles = redconvert.load()
-        temp = 0
-        for y in range(0, rimheight):
-            for x in range(0, rimwidth):
-                if Redpixles[x, y] < 127:  # black
-                    Redbuf[int((x + y * self.width) / 8)] &= ~(0x80 >> temp)
-                else:  # white
-                    Redbuf[int((x + y * self.width) / 8)] |= 0x80 >> temp
-                temp = temp + 1
-                if temp == 8:
-                    temp = 0
 
-        # S2 part 648*492
-        self.S2_SendCommand(0x10)
-        for y in range(0, 492):
-            for x in range(0, 81):
-                self.S2_SendData(Blackbuf[y * 163 + x])
-        self.S2_SendCommand(0x13)
-        for y in range(0, 492):
-            for x in range(0, 81):
-                self.S2_SendData(~Redbuf[y * 163 + x])
+        logger.info("Building black buffer")
 
-        # M2 part 656*492
-        self.M2_SendCommand(0x10)
-        for y in range(0, 492):
-            for x in range(81, 163):
-                self.M2_SendData(Blackbuf[y * 163 + x])
-        self.M2_SendCommand(0x13)
-        for y in range(0, 492):
-            for x in range(81, 163):
-                self.M2_SendData(~Redbuf[y * 163 + x])
+        # --- Build black buffer ---
+        black = BlackImage.convert("1")
+        bw, bh = black.size
+        bpix = black.load()
 
-        # M1 part 648*492
-        self.M1_SendCommand(0x10)
-        for y in range(492, 984):
-            for x in range(0, 81):
-                self.M1_SendData(Blackbuf[y * 163 + x])
-        self.M1_SendCommand(0x13)
-        for y in range(492, 984):
-            for x in range(0, 81):
-                self.M1_SendData(~Redbuf[y * 163 + x])
+        Blackbuf = [0xFF] * (bytes_per_row * height)
 
-        # S1 part 656*492
-        self.S1_SendCommand(0x10)
-        for y in range(492, 984):
-            for x in range(81, 163):
-                self.S1_SendData(Blackbuf[y * 163 + x])
-        self.S1_SendCommand(0x13)
-        for y in range(492, 984):
-            for x in range(81, 163):
-                self.S1_SendData(~Redbuf[y * 163 + x])
+        idx = 0
+        bit = 0
+        for y in range(bh):
+            for x in range(bw):
+                if bpix[x, y] < 127:
+                    Blackbuf[idx] &= ~(0x80 >> bit)
+                else:
+                    Blackbuf[idx] |= (0x80 >> bit)
+
+                bit += 1
+                if bit == 8:
+                    bit = 0
+                    idx += 1
+
+        logger.info("black buffer done")                    
+
+        logger.info("Building red buffer")
+
+        # --- Build red buffer ---
+        red = RedImage.convert("1")
+        rpix = red.load()
+
+        Redbuf = [0xFF] * (bytes_per_row * height)
+
+        idx = 0
+        bit = 0
+        for y in range(height):
+            for x in range(width):
+                if rpix[x, y] < 127:
+                    Redbuf[idx] &= ~(0x80 >> bit)
+                else:
+                    Redbuf[idx] |= (0x80 >> bit)
+
+                bit += 1
+                if bit == 8:
+                    bit = 0
+                    idx += 1
+
+        # --- Precompute inverted red buffer ---
+        Redbuf_inv = [~b & 0xFF for b in Redbuf]
+
+        logger.info("red buffer done")
+
+        # --- Helper to send a region ---
+        def send_region(send_cmd, send_data2, y_start, y_end, x_start, x_end):
+            logger.info("Sending region")
+            # Black channel
+            send_cmd(0x10)
+            for y in range(y_start, y_end):
+                row_start = y * bytes_per_row
+                send_data2(Blackbuf[row_start + x_start : row_start + x_end])
+
+            # Red channel
+            send_cmd(0x13)
+            for y in range(y_start, y_end):
+                row_start = y * bytes_per_row
+                send_data2(Redbuf_inv[row_start + x_start : row_start + x_end])
+            logger.info("finished sending region")
+
+        # --- Send all 4 regions ---
+
+        send_region(self.S2_SendCommand, self.S2_SendData2, 0, 492, 0, 81)
+        send_region(self.M2_SendCommand, self.M2_SendData2, 0, 492, 81, 163)
+        send_region(self.M1_SendCommand, self.M1_SendData2, 492, 984, 0, 81)
+        send_region(self.S1_SendCommand, self.S1_SendData2, 492, 984, 81, 163)
 
         end = time.perf_counter()
         print("use time: %f" % (end - start))
+
+        logger.info("starting TurnOnDisplay()")
         self.TurnOnDisplay()
+        logger.info("finished TurnOnDisplay()")
 
     def clear(self):
         """Clear contents of image buffer"""
