@@ -194,17 +194,19 @@ class EPD(object):
         # --- Helper to send a region ---
         def send_region(send_cmd, send_data2, y_start, y_end, x_start, x_end):
             logger.info("Sending region")
+            logger.info("before sending black")
             # Black channel
             send_cmd(0x10)
             for y in range(y_start, y_end):
                 row_start = y * bytes_per_row
                 send_data2(Blackbuf[row_start + x_start : row_start + x_end])
 
+            # logger.info("before sending red")
             # Red channel
-            send_cmd(0x13)
-            for y in range(y_start, y_end):
-                row_start = y * bytes_per_row
-                send_data2(Redbuf_inv[row_start + x_start : row_start + x_end])
+            # send_cmd(0x13)
+            # for y in range(y_start, y_end):
+            #     row_start = y * bytes_per_row
+            #     send_data2(Redbuf_inv[row_start + x_start : row_start + x_end])
             logger.info("finished sending region")
 
         # --- Send all 4 regions ---
