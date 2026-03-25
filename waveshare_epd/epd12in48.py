@@ -28,6 +28,9 @@
 #
 import time
 import epdconfig
+import logging
+
+logger = logging.getLogger(__name__)
 
 EPD_WIDTH       = 1304
 EPD_HEIGHT      = 984
@@ -135,6 +138,9 @@ class EPD(object):
         height = self.height
         bytes_per_row = width // 8  # 163
 
+
+        logger.info("Building black buffer")
+
         # --- Build black buffer ---
         black = BlackImage.convert("1")
         bw, bh = black.size
@@ -155,6 +161,10 @@ class EPD(object):
                 if bit == 8:
                     bit = 0
                     idx += 1
+
+        logger.info("black buffer done")                    
+
+        logger.info("Building red buffer")
 
         # --- Build red buffer ---
         red = RedImage.convert("1")
@@ -179,8 +189,11 @@ class EPD(object):
         # --- Precompute inverted red buffer ---
         Redbuf_inv = [~b & 0xFF for b in Redbuf]
 
+        logger.info("red buffer done")
+
         # --- Helper to send a region ---
         def send_region(send_cmd, send_data2, y_start, y_end, x_start, x_end):
+            logger.info("Sending region")
             # Black channel
             send_cmd(0x10)
             for y in range(y_start, y_end):
@@ -192,8 +205,10 @@ class EPD(object):
             for y in range(y_start, y_end):
                 row_start = y * bytes_per_row
                 send_data2(Redbuf_inv[row_start + x_start : row_start + x_end])
+            logger.info("finished sending region")
 
         # --- Send all 4 regions ---
+
         send_region(self.S2_SendCommand, self.S2_SendData2, 0, 492, 0, 81)
         send_region(self.M2_SendCommand, self.M2_SendData2, 0, 492, 81, 163)
         send_region(self.M1_SendCommand, self.M1_SendData2, 492, 984, 0, 81)
@@ -202,7 +217,9 @@ class EPD(object):
         end = time.perf_counter()
         print("use time: %f" % (end - start))
 
+        logger.info("starting TurnOnDisplay()")
         self.TurnOnDisplay()
+        logger.info("finished TurnOnDisplay()")
 
     def clear(self):
         """Clear contents of image buffer"""
