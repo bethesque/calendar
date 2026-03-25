@@ -97,4 +97,6 @@ def delay_ms(delaytime):
     time.sleep(delaytime / 1000.0)
 
 def spi_writebyte2(data):
-    spi.writebytes(data)  
+    write = spi_writebyte  # local reference (important speed trick)
+    for b in data:
+        write(b) 

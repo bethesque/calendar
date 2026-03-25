@@ -163,53 +163,15 @@ class EPD(object):
 
 
         logger.info("Building black buffer")
-
-        # --- Build black buffer ---
         black = BlackImage.convert("1")
-        bw, bh = black.size
-        bpix = black.load()
-
-        Blackbuf = [0xFF] * (bytes_per_row * height)
-
-        idx = 0
-        bit = 0
-        for y in range(bh):
-            for x in range(bw):
-                if bpix[x, y] < 127:
-                    Blackbuf[idx] &= ~(0x80 >> bit)
-                else:
-                    Blackbuf[idx] |= (0x80 >> bit)
-
-                bit += 1
-                if bit == 8:
-                    bit = 0
-                    idx += 1
-
-        logger.info("black buffer done")                    
+        Blackbuf = list(black.tobytes())
+        logger.info("black buffer done")
 
         logger.info("Building red buffer")
-
-        # --- Build red buffer ---
         red = RedImage.convert("1")
-        rpix = red.load()
+        Redbuf = list(red.tobytes())
+        logger.info("red buffer done")
 
-        Redbuf = [0xFF] * (bytes_per_row * height)
-
-        idx = 0
-        bit = 0
-        for y in range(height):
-            for x in range(width):
-                if rpix[x, y] < 127:
-                    Redbuf[idx] &= ~(0x80 >> bit)
-                else:
-                    Redbuf[idx] |= (0x80 >> bit)
-
-                bit += 1
-                if bit == 8:
-                    bit = 0
-                    idx += 1
-
-        # --- Precompute inverted red buffer ---
         Redbuf_inv = [~b & 0xFF for b in Redbuf]
 
         logger.info("red buffer done")
