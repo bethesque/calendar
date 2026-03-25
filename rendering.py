@@ -14,26 +14,26 @@ YELLOW = 0x00FFFF  #   10
 RED = 0x0000FF  #   11
 
 
-# DEFAULT_FONT_FILE = "Font.ttc"
-# BOLD_FONT_FILE = "Font.ttc"
+# DEFAULT_FONT_FILE = "fonts/Font.ttc"
+# BOLD_FONT_FILE = "fonts/Font.ttc"
 # FONT_SIZE_H1 = 48
 # FONT_SIZE_DEFAULT = 24
 # FONT_SIZE_SUMMARY = 36
 # PADDING = 5
 
 
-DEFAULT_FONT_FILE = "DejaVuSansCondensed.ttf"
-BOLD_FONT_FILE = "DejaVuSansCondensed-Bold.ttf"
+DEFAULT_FONT_FILE = "fonts/DejaVuSansCondensed.ttf"
+BOLD_FONT_FILE = "fonts/DejaVuSansCondensed-Bold.ttf"
 FONT_SIZE_H1 = 48
 FONT_SIZE_DEFAULT = 28
 FONT_SIZE_SUMMARY = 43
 PADDING = 5
 
-#DEFAULT_FONT_FILE = "RobotoCondensed-Regular.ttf"
-#BOLD_FONT_FILE = "RobotoCondensed-Bold.ttf"
+#DEFAULT_FONT_FILE = "fonts/RobotoCondensed-Regular.ttf"
+#BOLD_FONT_FILE = "fonts/RobotoCondensed-Bold.ttf"
 
-# DEFAULT_FONT_FILE = "LiberationSansNarrow-Regular.ttf"
-# BOLD_FONT_FILE = "LiberationSansNarrow-Bold.ttf"
+# DEFAULT_FONT_FILE = "fonts/LiberationSansNarrow-Regular.ttf"
+# BOLD_FONT_FILE = "fonts/LiberationSansNarrow-Bold.ttf"
 # FONT_SIZE_H1 = 50
 # FONT_SIZE_DEFAULT = 24
 # FONT_SIZE_SUMMARY = 36
