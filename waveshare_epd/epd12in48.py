@@ -128,50 +128,80 @@ class EPD(object):
         self.M1S1M2S2_SendCommand(0xe5) #Force temperature
         self.M1S1M2S2_SendData(temp)
         
-    def display(self, Image):
-        start = time.clock()
-        buf = [0x00] * int(self.width * self.height / 8)
-        image_monocolor = Image.convert('1')
-        imwidth, imheight = image_monocolor.size 
-        pixels = image_monocolor.load()
-        temp=0;
-        for y in range(0, imheight):
-                for x in range(0, imwidth):
-                    # Set the bits for the column of pixels at the current position.
-                    if pixels[x, y] < 127:           # black
-                        buf[int((x + y*self.width)/8)] &= ~(0x80>>temp)
-                    else:                           # white
-                        buf[int((x + y*self.width)/8)] |= (0x80>>temp)
-                    temp=temp+1
-                    if(temp==8):
-                        temp=0
+    def display(self, BlackImage, RedImage):
+        start = time.perf_counter()
 
-        #M1 part 648*492    
-        self.M1_SendCommand(0x13)
-        for y in  range(492, 984):
-            for x in  range(0, 81):
-                    self.M1_SendData(buf[y*163 + x])
+        width = self.width
+        height = self.height
+        bytes_per_row = width // 8  # 163
 
-        #S1 part 656*492
-        self.S1_SendCommand(0x13)
-        for y in  range(492, 984):
-            for x in  range(81, 163):
-                self.S1_SendData(buf[y*163 + x])
+        # --- Build black buffer ---
+        black = BlackImage.convert("1")
+        bw, bh = black.size
+        bpix = black.load()
 
-        #M2 part 656*492
-        self.M2_SendCommand(0x13)
-        for y in  range(0, 492):
-            for x in  range(81, 163):
-                self.M2_SendData(buf[y*163 + x])
+        Blackbuf = [0xFF] * (bytes_per_row * height)
 
-        #S2 part 648*492
-        self.S2_SendCommand(0x13)
-        for y in  range(0, 492):
-            for x in  range(0, 81):
-                self.S2_SendData(buf[y*163 + x])
-                
-        end = time.clock()
-        print("use time:%f"%(end - start))
+        idx = 0
+        bit = 0
+        for y in range(bh):
+            for x in range(bw):
+                if bpix[x, y] < 127:
+                    Blackbuf[idx] &= ~(0x80 >> bit)
+                else:
+                    Blackbuf[idx] |= (0x80 >> bit)
+
+                bit += 1
+                if bit == 8:
+                    bit = 0
+                    idx += 1
+
+        # --- Build red buffer ---
+        red = RedImage.convert("1")
+        rpix = red.load()
+
+        Redbuf = [0xFF] * (bytes_per_row * height)
+
+        idx = 0
+        bit = 0
+        for y in range(height):
+            for x in range(width):
+                if rpix[x, y] < 127:
+                    Redbuf[idx] &= ~(0x80 >> bit)
+                else:
+                    Redbuf[idx] |= (0x80 >> bit)
+
+                bit += 1
+                if bit == 8:
+                    bit = 0
+                    idx += 1
+
+        # --- Precompute inverted red buffer ---
+        Redbuf_inv = [~b & 0xFF for b in Redbuf]
+
+        # --- Helper to send a region ---
+        def send_region(send_cmd, send_data2, y_start, y_end, x_start, x_end):
+            # Black channel
+            send_cmd(0x10)
+            for y in range(y_start, y_end):
+                row_start = y * bytes_per_row
+                send_data2(Blackbuf[row_start + x_start : row_start + x_end])
+
+            # Red channel
+            send_cmd(0x13)
+            for y in range(y_start, y_end):
+                row_start = y * bytes_per_row
+                send_data2(Redbuf_inv[row_start + x_start : row_start + x_end])
+
+        # --- Send all 4 regions ---
+        send_region(self.S2_SendCommand, self.S2_SendData2, 0, 492, 0, 81)
+        send_region(self.M2_SendCommand, self.M2_SendData2, 0, 492, 81, 163)
+        send_region(self.M1_SendCommand, self.M1_SendData2, 492, 984, 0, 81)
+        send_region(self.S1_SendCommand, self.S1_SendData2, 492, 984, 81, 163)
+
+        end = time.perf_counter()
+        print("use time: %f" % (end - start))
+
         self.TurnOnDisplay()
 
     def clear(self):
@@ -261,6 +291,31 @@ class EPD(object):
         epdconfig.digital_write(self.EPD_S2_CS_PIN, 0)
         epdconfig.spi_writebyte(val)
         epdconfig.digital_write(self.EPD_S2_CS_PIN, 1)
+
+    def S2_SendData2(self, data):
+        epdconfig.digital_write(self.EPD_M2S2_DC_PIN, 1)
+        epdconfig.digital_write(self.EPD_S2_CS_PIN, 0)
+        epdconfig.spi_writebyte2(data)   # send MANY bytes at once
+        epdconfig.digital_write(self.EPD_S2_CS_PIN, 1)    
+
+
+    def M2_SendData2(self, data):
+        epdconfig.digital_write(self.EPD_M2S2_DC_PIN, 1)
+        epdconfig.digital_write(self.EPD_M2_CS_PIN, 0)
+        epdconfig.spi_writebyte2(data)
+        epdconfig.digital_write(self.EPD_M2_CS_PIN, 1)
+
+    def M1_SendData2(self, data):
+        epdconfig.digital_write(self.EPD_M1S1_DC_PIN, 1)
+        epdconfig.digital_write(self.EPD_M1_CS_PIN, 0)
+        epdconfig.spi_writebyte2(data)
+        epdconfig.digital_write(self.EPD_M1_CS_PIN, 1)
+
+    def S1_SendData2(self, data):
+        epdconfig.digital_write(self.EPD_M1S1_DC_PIN, 1)
+        epdconfig.digital_write(self.EPD_S1_CS_PIN, 0)
+        epdconfig.spi_writebyte2(data)
+        epdconfig.digital_write(self.EPD_S1_CS_PIN, 1)        
         
     """   M2 Write register address and data     """
     def M2_SendCommand(self, cmd):

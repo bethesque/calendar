@@ -96,4 +96,5 @@ def spi_readbyte(Reg):
 def delay_ms(delaytime):
     time.sleep(delaytime / 1000.0)
 
-  
+def spi_writebyte2(data):
+    spi.writebytes(data)  
