@@ -185,10 +185,10 @@ class EPD(object):
                 send_data2(Blackbuf[row_start + x_start : row_start + x_end])
 
             # Red channel
-            # send_cmd(0x13)
-            # for y in range(y_start, y_end):
-            #     row_start = y * bytes_per_row
-            #     send_data2(Redbuf_inv[row_start + x_start : row_start + x_end])
+            send_cmd(0x13)
+            for y in range(y_start, y_end):
+                row_start = y * bytes_per_row
+                send_data2(Redbuf_inv[row_start + x_start : row_start + x_end])
             logger.info("finished sending region")
 
         # --- Send all 4 regions ---
