@@ -38,7 +38,7 @@ def layout_calendars(calendars: list[CalendarDay], surface):
 
             left_thing = Text(event.owner)
             if isinstance(event, WeatherForecast):
-                left_thing = Icon(file_path=event.image_path, _height=50, _width=50)
+                left_thing = Icon(file_path=event.image_path)
 
             day_box.children.append(
                 RightStretchBox(

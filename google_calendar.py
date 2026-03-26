@@ -13,11 +13,12 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+from weather_forecast import TSHIRT_AND_SHORTS_ICON_PATH, choose_clothing_icon
+
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
 TIMEZONE = "Australia/Melbourne"
-SHORTS_ICON = "images/Pixel art black and white shorts.png"
 
 logger = logging.getLogger(__name__)
 
@@ -130,7 +131,7 @@ def build_event(event_dict, calendar_name):
             owner=calendar_name, 
             summary=event_dict["summary"], 
             description="", 
-            image_path=SHORTS_ICON,
+            image_path=choose_clothing_icon(event_dict["summary"]),
         )
     else:
         return Event(
@@ -200,7 +201,8 @@ def test_data():
     calendars = [CalendarDay(date=today.date()), CalendarDay(date=tomorrow.date())]
     today = calendars[0]
     tomorrow = calendars[1]
-    today.whole_day_events.append(WeatherForecast("BoM", "Man 11, Max 16, 1-8mm 90%, Showers, Windy", "", image_path=SHORTS_ICON))
+    forecast = "Min 11, Max 16, 1-8mm 90%, Showers, Windy"
+    today.whole_day_events.append(WeatherForecast("BoM", forecast, "", image_path=choose_clothing_icon(forecast)))
     today.whole_day_events.append(Event("Trav", "Working on calendar epaper thing", "Once off event"))
     today.whole_day_events.append(Event("Trav", "A very important event", "#veryimportant", recurring=True))
     today.whole_day_events.append(Event("Trav", "A normal recurring event", "", recurring=True))

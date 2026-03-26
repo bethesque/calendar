@@ -131,19 +131,23 @@ class Text:
 @dataclass
 class Icon:
     file_path: str
-    _width: int
-    _height: int
+    _img: Image = None
 
     def height(self, width: int, draw: ImageDraw):
-        return self._height
+        return self.img().height
 
     def render(self, draw: ImageDraw, image: Image, surface: Surface):
-        img = Image.open(self.file_path)
+        image.paste(self.img(), (surface.left, surface.top))
 
-        if img.mode != "1":
-            img = img.convert("1", dither=0)
+    def img(self):
+        if self._img is not None:
+            return self._img
+        else:
+            self._img = Image.open(self.file_path)
+            if self._img.mode != "1":
+                self._img = self._img.convert("1", dither=0)
+            return self._img
 
-        image.paste(img, (surface.left, surface.top))
 
 
 @dataclass
