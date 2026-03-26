@@ -99,7 +99,8 @@ def list_google_events(creds, calendar_id, min, max):
             )
             .execute()
         )
-        return events_result.get("items", [])
+        events = events_result.get("items", [])
+        return [e for e in events if e.get("visibility") != "private"]
 
     except HttpError as error:
         logger.info("An error occurred: %s" % error)
