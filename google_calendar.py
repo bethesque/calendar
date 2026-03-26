@@ -17,6 +17,7 @@ from googleapiclient.errors import HttpError
 # If modifying these scopes, delete the file token.json.
 SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
 TIMEZONE = "Australia/Melbourne"
+SHORTS_ICON = "images/Pixel art black and white shorts.png"
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +36,12 @@ class Event:
     start_time: datetime.time = None
     end_time: datetime.time = None
     recurring: bool = False
+
+
+@dataclass
+class WeatherForecast(Event):
+    image_path: str = None
+    recurring: bool = True
 
 
 # A day displayed on the calendar screen
@@ -104,12 +111,35 @@ def add_events_to_calendars(events_from_google, calendar_name, displayed_calenda
         matched_days = [d for d in displayed_calendar_days if displayed_day_includes_event(d, event_dict)]
 
         for matched_day in matched_days:
-            event = Event(owner=calendar_name, summary=event_dict["summary"], description=event_dict.get("description"), recurring=bool(event_dict.get("recurringEventId")))
+            event = build_event(event_dict, calendar_name)
+
             if "dateTime" in event_dict["start"]: # has a time specified
                 event.start_time = datetime.datetime.fromisoformat(event_dict["start"]["dateTime"])
                 matched_day.timed_events.append(event)
             else:
                 matched_day.whole_day_events.append(event)
+
+
+def is_weather_forecast(event_dict):
+    return event_dict["summary"].startswith("Min ") or event_dict["summary"].startswith("Max ")
+
+
+def build_event(event_dict, calendar_name):
+    if is_weather_forecast(event_dict):
+        return WeatherForecast(
+            owner=calendar_name, 
+            summary=event_dict["summary"], 
+            description="", 
+            image_path=SHORTS_ICON,
+        )
+    else:
+        return Event(
+            owner=calendar_name, 
+            summary=event_dict["summary"], 
+            description=event_dict.get("description"), 
+            recurring=bool(event_dict.get("recurringEventId")),
+        )
+
 
 """
 Returns true if the event described by the properties in the event_dict falls on the date
@@ -170,6 +200,7 @@ def test_data():
     calendars = [CalendarDay(date=today.date()), CalendarDay(date=tomorrow.date())]
     today = calendars[0]
     tomorrow = calendars[1]
+    today.whole_day_events.append(WeatherForecast("BoM", "Man 11, Max 16, 1-8mm 90%, Showers, Windy", "", image_path=SHORTS_ICON))
     today.whole_day_events.append(Event("Trav", "Working on calendar epaper thing", "Once off event"))
     today.whole_day_events.append(Event("Trav", "A very important event", "#veryimportant", recurring=True))
     today.whole_day_events.append(Event("Trav", "A normal recurring event", "", recurring=True))

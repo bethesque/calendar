@@ -94,7 +94,7 @@ class Text:
     font: object = font()
     padding_top: int = 0
 
-    def render(self, draw: ImageDraw, surface: Surface):
+    def render(self, draw: ImageDraw, image: Image, surface: Surface):
         text = self.wrapped_text(surface.right - surface.left)
 
         # Debugging - make the background of the text yellow
@@ -129,6 +129,24 @@ class Text:
 
 
 @dataclass
+class Icon:
+    file_path: str
+    _width: int
+    _height: int
+
+    def height(self, width: int, draw: ImageDraw):
+        return self._height
+
+    def render(self, draw: ImageDraw, image: Image, surface: Surface):
+        img = Image.open(self.file_path)
+
+        if img.mode != "1":
+            img = img.convert("1", dither=0)
+
+        image.paste(img, (surface.left, surface.top))
+
+
+@dataclass
 class StackChildrenBox:
     padding: int = PADDING
     margin: int = 0
@@ -138,7 +156,7 @@ class StackChildrenBox:
     fill: int = None
     children: list = field(default_factory=list)
 
-    def render(self, draw: ImageDraw, surface: Surface):
+    def render(self, draw: ImageDraw, image: Image, surface: Surface):
         t = surface.top
         b = surface.bottom
         l = surface.left
@@ -163,7 +181,7 @@ class StackChildrenBox:
             if cb > b:
                 cb = b
             cs = Surface(top=t, left=cl, right=cr, bottom=cb)
-            child.render(draw, cs)
+            child.render(draw, image, cs)
             t = t + ch
             if cb == b:
                 return
@@ -188,7 +206,7 @@ class RightStretchBox:
             self.right.height(width - self.left_width - borders(self) / 2, draw),
         ) + borders(self)
 
-    def render(self, draw: ImageDraw, surface: Surface):
+    def render(self, draw: ImageDraw, image: Image, surface: Surface):
         t = surface.top
         b = surface.bottom
         l = surface.left
@@ -209,11 +227,11 @@ class RightStretchBox:
         ct = t + m + p
         cb = self.height(w, draw)
         cs = Surface(top=ct, left=cl, right=cr, bottom=cb)
-        self.left.render(draw, cs)
+        self.left.render(draw, image, cs)
         cl = cr
         cr = r - m - p
         cs = Surface(top=ct, left=cl, right=cr, bottom=cb)
-        self.right.render(draw, cs)
+        self.right.render(draw, image, cs)
 
 
 @dataclass
@@ -226,7 +244,7 @@ class EqualChildrenBox:
     fill: int = None
     children: list = field(default_factory=list)
 
-    def render(self, draw: ImageDraw, surface: Surface):
+    def render(self, draw: ImageDraw, image: Image, surface: Surface):
         t = surface.top
         b = surface.bottom
         h = b - t
@@ -258,7 +276,7 @@ class EqualChildrenBox:
                 ct = t + m + p + int(step * i)
                 cb = t + m + p + int(step * (i + 1))
             cs = Surface(top=ct, left=cl, right=cr, bottom=cb)
-            child.render(draw, cs)
+            child.render(draw, image, cs)
 
 
 @dataclass
@@ -271,7 +289,7 @@ class SingleChildBox:
     fill: int = None
     child: object = None
 
-    def render(self, draw: ImageDraw, surface: Surface):
+    def render(self, draw: ImageDraw, image: Image, surface: Surface):
         t = surface.top
         b = surface.bottom
         l = surface.left
@@ -293,7 +311,7 @@ class SingleChildBox:
         ct = t + m + p + s
         cb = b - m - p - s
         cs = Surface(top=ct, left=cl, right=cr, bottom=cb)
-        child.render(draw, cs)
+        child.render(draw, image, cs)
 
     def height(self, width: int, draw: ImageDraw):
         return (

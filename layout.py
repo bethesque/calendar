@@ -1,5 +1,5 @@
 from rendering import *
-from google_calendar import CalendarDay, Event
+from google_calendar import CalendarDay, Event, WeatherForecast
 
 weekdays = [
     "Monday",
@@ -36,12 +36,16 @@ def layout_calendars(calendars: list[CalendarDay], surface):
             summary = extract_summary(event)
             summary_font = decide_summary_font(event)
 
+            left_thing = Text(event.owner)
+            if isinstance(event, WeatherForecast):
+                left_thing = Icon(file_path=event.image_path, _height=50, _width=50)
+
             day_box.children.append(
                 RightStretchBox(
                     fill=WHITE,
                     margin=2,
                     left_width=LEFT_WIDTH,
-                    left=Text(event.owner),
+                    left=left_thing,
                     right=Text(summary, font=summary_font, color=BLACK),
                 )
             )
@@ -70,7 +74,7 @@ def layout_calendars(calendars: list[CalendarDay], surface):
     #     r = (380, t, 390, b)
     #     draw.rectangle(r, RED)
 
-    box.render(draw, surface)
+    box.render(draw, image, surface)
 
     # draw.text((5, 0), 'hello beth', font = font, fill = surface.RED)
 
@@ -95,6 +99,4 @@ def is_important(event):
     marked_very_important = event.description and "#veryimportant" in event.description
     marked_not_important = event.description and "#notimportant" in event.description
     once_off_event = not event.recurring
-    is_weather = event.summary.startswith("Min ") or event.summary.startswith("Max ")
-
-    return marked_important or marked_very_important or (once_off_event and not marked_not_important and not is_weather)
+    return marked_important or marked_very_important or (once_off_event and not marked_not_important)
