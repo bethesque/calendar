@@ -1,69 +1,82 @@
 import subprocess
 import time
+import json
+import socket
 import os
 
-# Path to the FIFO
-FIFO = "/tmp/mpvpipe"
-
-# Path to your alarm file (can preload in /dev/shm if desired)
+IPC_SOCKET = "/tmp/mpv_socket"
 ALARM_FILE = "alarm.mp3"
 
-# Ensure the FIFO exists
-if not os.path.exists(FIFO):
-    os.mkfifo(FIFO)
-
-# Start mpv in idle mode
-def start_mpv():
+def is_mpv_running():
+    """Return True if mpv IPC socket exists and is connectable."""
+    if not os.path.exists(IPC_SOCKET):
+        return False
     try:
-        return subprocess.Popen([
-            "mpv",
-            "--idle=yes",           # stay open when not playing
-            "--no-video",           # audio only
-            "--input-file=" + FIFO,
-            "--really-quiet"        # suppress extra logs
-        ])
-    except Exception as e:
-        print("Failed to start mpv:", e)
+        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
+            s.settimeout(0.1)
+            s.connect(IPC_SOCKET)
+        return True
+    except (ConnectionRefusedError, FileNotFoundError, socket.timeout):
+        return False
+
+def start_mpv():
+    """Start mpv with IPC if not already running."""
+    if is_mpv_running():
+        print("mpv is already running")
         return None
 
-# Play a file instantly
+    # Remove old socket if it exists
+    if os.path.exists(IPC_SOCKET):
+        os.remove(IPC_SOCKET)
+
+    proc = subprocess.Popen([
+        "mpv",
+        "--idle=yes",
+        "--no-video",
+        f"--input-ipc-server={IPC_SOCKET}",
+        "--really-quiet"
+    ])
+    # Give mpv a moment to start and create the socket
+    time.sleep(0.5)
+    return proc
+
+def send_command(cmd, args=None):
+    if args is None:
+        args = []
+    message = json.dumps({"command": [cmd] + args}) + "\n"
+    try:
+        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
+            s.connect(IPC_SOCKET)
+            s.sendall(message.encode("utf-8"))
+    except (ConnectionRefusedError, FileNotFoundError):
+        print("mpv is not running or IPC socket missing")
+
 def play_alarm(file_path=ALARM_FILE):
-    with open(FIFO, "w") as fifo:
-        fifo.write(f"loadfile {file_path}\n")
+    send_command("loadfile", [file_path])
 
-# Stop playback immediately
 def stop_alarm():
-    with open(FIFO, "w") as fifo:
-        fifo.write("stop\n")
+    send_command("stop")
 
-# Fade out over 'duration' seconds
+def set_volume(vol):
+    send_command("set_property", ["volume", vol])
+
 def fade_out(duration=2.0, steps=10):
     step_time = duration / steps
     for vol in reversed(range(0, 101, 100 // steps)):
-        with open(FIFO, "w") as fifo:
-            fifo.write(f"set volume {vol}\n")
+        set_volume(vol)
         time.sleep(step_time)
     stop_alarm()
-    # Reset volume to 100% for next play
-    with open(FIFO, "w") as fifo:
-        fifo.write("set volume 100\n")
+    set_volume(100)  # reset volume
 
 # Example usage
 if __name__ == "__main__":
-    # Start mpv if not already running
-    mpv_proc = start_mpv()
+    start_mpv()  # Only starts if not already running
 
-    try:
-        print("Playing alarm...")
-        play_alarm()
-        time.sleep(5)  # wait 5 seconds
+    print("Playing alarm...")
+    play_alarm()
+    time.sleep(5)
 
-        print("Fading out alarm...")
-        fade_out(duration=3.0)
+    print("Fading out alarm...")
+    fade_out(duration=3.0)
 
-        print("Done")
-    except BrokenPipeError:
-        # If mpv crashed, restart and try again
-        print("mpv crashed, restarting...")
-        mpv_proc = start_mpv()
-        play_alarm()
+    print("Done")
