@@ -1,7 +1,13 @@
+import logging
 import cherrypy
 import google_auth_oauthlib.flow
-from env import SERVER_ADDRESS, SCOPE, login_hint
+from env import SERVER_ADDRESS, SCOPE, login_hint, ALARM_PID_FILE
 import os, signal
+from log_config import setup_logging
+
+setup_logging()
+
+logger = logging.getLogger(__name__)
 
 class AlarmController(object):
 
@@ -24,17 +30,16 @@ class AlarmController(object):
 
     @cherrypy.expose
     def stop(self):
-        pid_file = "/tmp/alarm.pid"
         message = ""
 
-        if os.path.exists(pid_file):
+        if os.path.exists(ALARM_PID_FILE):
             try:
-                with open(pid_file, "r") as f:
+                with open(ALARM_PID_FILE, "r") as f:
                     pid = int(f.read().strip())
 
                 os.kill(pid, signal.SIGTERM)  # Gracefully stop the process
                 message = f"Alarm process {pid} stopped."
-                os.remove(pid_file)  # Clean up the PID file
+                os.remove(ALARM_PID_FILE)  # Clean up the PID file
             except ProcessLookupError:
                 message = f"No process with PID {pid} found."
             except Exception as e:
@@ -42,7 +47,7 @@ class AlarmController(object):
         else:
             message = "PID file not found. Alarm may not be running."
 
-        print(message)  # Logs to console
+        logger.info(message)
         return f"""
         <html>
             <body>
