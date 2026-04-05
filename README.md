@@ -71,14 +71,18 @@ Schedule the main screen update for hourly with:
 # Force refresh on startup
 @reboot cd /home/thetrav/calendar && /usr/bin/python /home/thetrav/calendar/main.py --force >> /home/thetrav/calendar/log.txt
 
-# Lazy refresh once an hour if data has changed
-0 * * * * cd /home/thetrav/calendar && ./main.sh
+# Lazy refresh once an hour if data has changed - fetch the data just before the hour in case there is an alarm
+55 * * * * cd /home/thetrav/calendar && ./main.sh
 
 # Force refresh once a minute if the token has been updated
 * * * * * cd /home/thetrav/calendar && ./main-update-screen-if-token-updated.sh
 
 # Stop the log file getting too big - at 2am on a Sunday, get rid of all but the last 500 lines
 0 2 * * 0 [ -f /home/thetrav/calendar/log.txt ] && /usr/bin/tail -n 500 /home/thetrav/calendar/log.txt > /home/thetrav/calendar/log.tmp && /bin/mv /home/thetrav/calendar/log.tmp /home/thetrav/calendar/log.txt
+
+# Check for alarms
+*/5 * * * * cd /home/thetrav/calendar && /usr/bin/python check_for_alarams.py
+
 ```
 
 ## web server
