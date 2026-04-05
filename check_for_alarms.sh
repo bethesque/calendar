@@ -2,6 +2,8 @@
 
 set -Eeuo pipefail
 
+echo "Checking for alarms at $(date)"
+
 # --- CONFIG ---
 if [ -z "${1:-}" ]; then
     echo "Usage: $0 <device-mac>" >&2
