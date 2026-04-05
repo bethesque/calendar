@@ -40,6 +40,22 @@ def start_mpv():
     time.sleep(0.5)
     return proc
 
+def wait_for_ipc(timeout=2.0):
+    """Wait until mpv IPC socket exists and is connectable."""
+    start = time.time()
+    while True:
+        if os.path.exists(IPC_SOCKET):
+            try:
+                with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
+                    s.settimeout(0.1)
+                    s.connect(IPC_SOCKET)
+                return True
+            except (ConnectionRefusedError, socket.timeout):
+                pass
+        if time.time() - start > timeout:
+            return False
+        time.sleep(0.05)
+
 def send_command(cmd, args=None):
     if args is None:
         args = []
@@ -70,7 +86,10 @@ def fade_out(duration=2.0, steps=10):
 
 # Example usage
 if __name__ == "__main__":
-    start_mpv()  # Only starts if not already running
+    mpv_proc = start_mpv()  # starts mpv if not running
+    if not wait_for_ipc(timeout=10.0):
+        print("Error: mpv IPC socket not ready")
+        exit(1)    
 
     print("Playing alarm...")
     play_alarm()
