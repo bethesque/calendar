@@ -5,8 +5,6 @@ After=multi-user.target
 [Service]
 WorkingDirectory=/home/thetrav/calendar
 ExecStart=/usr/bin/python /home/thetrav/calendar/index.py
-Restart=always
-RestartSec=5s
 User=thetrav
 
 [Install]
