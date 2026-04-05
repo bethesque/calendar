@@ -52,8 +52,10 @@ def alarm_player():
 def play_alarm():
     logging.info("Playing alarm sound")
     script_dir = os.path.dirname(os.path.abspath(__file__))
+    log_file = os.path.join(script_dir, "log.txt")
     alarm_file = os.path.join(script_dir, "alarm.mp3")
-    process = subprocess.Popen([alarm_player(), alarm_file], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    with open(log_file, "a") as f:
+        process = subprocess.Popen([alarm_player(), alarm_file], stdout=f, stderr=subprocess.STDOUT)
     with open(ALARM_PID_FILE, "w") as f:
         f.write(str(process.pid))
     logging.info("Alarm process started with PID: %d", process.pid)

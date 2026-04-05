@@ -81,7 +81,7 @@ Schedule the main screen update for hourly with:
 0 2 * * 0 [ -f /home/thetrav/calendar/log.txt ] && /usr/bin/tail -n 500 /home/thetrav/calendar/log.txt > /home/thetrav/calendar/log.tmp && /bin/mv /home/thetrav/calendar/log.tmp /home/thetrav/calendar/log.txt
 
 # Check for alarms
-*/5 * * * * cd /home/thetrav/calendar && /usr/bin/python check_for_alarms.py
+*/5 * * * * cd /home/thetrav/calendar && /usr/bin/python check_for_alarms.py --window 5
 
 ```
 
