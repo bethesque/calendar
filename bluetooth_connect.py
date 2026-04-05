@@ -10,11 +10,15 @@ def run(cmd):
 def bluetooth_connect(mac):
     print("Connecting to Bluetooth device...")
 
-    cmd = f'echo -e "connect {mac}\\nquit" | bluetoothctl'
-    result = run(cmd)
+    process = subprocess.run(
+        ["bluetoothctl"],
+        input=f"connect {mac}\nquit\n",
+        text=True,
+        capture_output=True
+    )
 
-    print(result.stdout)
-    return "Connection successful" in result.stdout or "Connection successful" in result.stderr
+    print(process.stdout)
+    return "Connection successful" in process.stdout
 
 def get_bt_sink():
     result = run("pactl list short sinks")
