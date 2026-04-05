@@ -5,7 +5,7 @@ import socket
 import os
 
 IPC_SOCKET = "/tmp/mpv_socket"
-ALARM_FILE = "alarm.mp3"
+ALARM_FILES = ["welcome.mp3", "alarm.mp3"]
 
 def is_mpv_running():
     """Return True if mpv IPC socket exists and is connectable."""
@@ -67,8 +67,17 @@ def send_command(cmd, args=None):
     except (ConnectionRefusedError, FileNotFoundError):
         print("mpv is not running or IPC socket missing")
 
-def play_alarm(file_path=ALARM_FILE):
+def play_alarm(file_path):
     send_command("loadfile", [file_path])
+
+def play_alarm_loop(files, duration=20.0, interval=2.0):
+    end_time = time.time() + duration
+    index = 0
+    while time.time() < end_time:
+        play_alarm(files[index])
+        index = (index + 1) % len(files)
+        time.sleep(interval)
+    stop_alarm()
 
 def stop_alarm():
     send_command("stop")
@@ -91,11 +100,7 @@ if __name__ == "__main__":
         print("Error: mpv IPC socket not ready")
         exit(1)    
 
-    print("Playing alarm...")
-    play_alarm()
-    time.sleep(5)
-
-    print("Fading out alarm...")
-    fade_out(duration=3.0)
+    print("Alternating alarm files for 20 seconds...")
+    play_alarm_loop(ALARM_FILES, duration=30.0, interval=5.0)
 
     print("Done")
