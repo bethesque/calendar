@@ -13,7 +13,7 @@ fi
 DEVICE_MAC=$1
 
 # --- ENV FIXES (critical for cron) ---
-export XDG_RUNTIME_DIR="/run/user/$(id -u $USER)"
+export XDG_RUNTIME_DIR="/run/user/$(id -u)"
 export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"
 
 # --- Wait for Bluetooth service ---
