@@ -2,7 +2,7 @@
 
 set -Eeuo pipefail
 
-echo "Checking for alarms at $(date) for $USER"
+echo "Checking for alarms at $(date)"
 
 # --- CONFIG ---
 if [ -z "${1:-}" ]; then
