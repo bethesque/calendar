@@ -4,8 +4,7 @@ import json
 import socket
 import os
 
-IPC_SOCKET = "/tmp/mpv_socket"
-ALARM_SOCKET = "/tmp/mpv_socket"
+ALARM_SOCKET = "/tmp/mpv_alarm.sock"
 ANNOUNCEMENT_SOCKET = "/tmp/mpv_announcement.sock"
 ALARM_FILES = ["announcement.mp3", "alarm.mp3"]
 DEFAULT_VOLUME = 50
@@ -40,8 +39,6 @@ def start_mpv(ipc_socket):
         f"--input-ipc-server={ipc_socket}",
         "--really-quiet"
     ])
-    # Give mpv a moment to start and create the socket
-    time.sleep(0.5)
     return proc
 
 def wait_for_ipc(ipc_socket, timeout=2.0):
@@ -86,10 +83,16 @@ def set_volume(ipc_socket, vol):
   
 # Example usage
 if __name__ == "__main__":
-    mpv_proc = start_mpv()  # starts mpv if not running
-    if not wait_for_ipc(timeout=10.0):
-        print("Error: mpv IPC socket not ready")
+    start_mpv(ALARM_SOCKET)
+    start_mpv(ANNOUNCEMENT_SOCKET)
+
+    if not wait_for_ipc(ALARM_SOCKET, timeout=10.0):
+        print("Error: mpv alarm IPC socket not ready")
         exit(1)
+
+    if not wait_for_ipc(ANNOUNCEMENT_SOCKET, timeout=10.0):
+        print("Error: mpv announcement IPC socket not ready")
+        exit(1)        
 
     set_volume(ALARM_SOCKET, DEFAULT_VOLUME)    
     set_volume(ANNOUNCEMENT_SOCKET, DEFAULT_VOLUME)    
