@@ -102,8 +102,13 @@ if __name__ == "__main__":
         exit(1)
 
     set_volume(DEFAULT_VOLUME)    
+    # Load both files into playlist and play simultaneously
+    send_command("loadfile", ["alarm.mp3"])
+    send_command("loadfile", ["welcome.mp3", "append"])
+    send_command("set_property", ["playlist-pos", 0])  # Start from first
+    send_command("set_property", ["playlist-pos", 1])  # Start second simultaneously
 
     print("Alternating alarm files for 20 seconds...")
-    play_alarm_loop(ALARM_FILES, duration=30.0, interval=5.0)
+    #play_alarm_loop(ALARM_FILES, duration=30.0, interval=5.0)
 
     print("Done")
