@@ -47,7 +47,7 @@ class MpvProcess:
             "--no-video",
             f"--input-ipc-server={self.ipc_socket}",
             "--really-quiet"
-        ])
+        ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
         return proc
 
     def wait_for_ipc(self, timeout=2.0):
