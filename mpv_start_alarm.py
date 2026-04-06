@@ -7,7 +7,7 @@ import os
 ALARM_SOCKET = "/tmp/mpv_alarm.sock"
 ANNOUNCEMENT_SOCKET = "/tmp/mpv_announcement.sock"
 ALARM_FILES = ["audio/announcement.mp3", "audio/alarm.mp3"]
-SILENCE_FILE = "audio/silence_10s.mp3"
+SILENCE_FILE = "audio/silence_5s.m4a"
 DEFAULT_VOLUME = 50
 
 # Note: You'll need to create a 10-second silent audio file named "silence_10s.m4a"
