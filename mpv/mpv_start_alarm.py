@@ -13,8 +13,8 @@ DEFAULT_VOLUME = 50
 # You can create one with: ffmpeg -f lavfi -i "sine=frequency=0:duration=10" -c:a aac silence_10s.m4a
 
 def play_alarms():
-    alarm_player = mpv.MpvProcess(ALARM_SOCKET)
-    announcement_player = mpv.MpvProcess(ANNOUNCEMENT_SOCKET)
+    alarm_player = MpvProcess(ALARM_SOCKET)
+    announcement_player = MpvProcess(ANNOUNCEMENT_SOCKET)
 
     alarm_player.start()
     announcement_player.start()

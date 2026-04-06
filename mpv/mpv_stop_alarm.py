@@ -5,8 +5,8 @@ ALARM_SOCKET = "/tmp/mpv_alarm.sock"
 ANNOUNCEMENT_SOCKET = "/tmp/mpv_announcement.sock"
 
 def fade_out(duration=2.0, steps=10):
-    alarm_player = mpv.MpvProcess(ALARM_SOCKET)
-    announcement_player = mpv.MpvProcess(ANNOUNCEMENT_SOCKET)
+    alarm_player = MpvProcess(ALARM_SOCKET)
+    announcement_player = MpvProcess(ANNOUNCEMENT_SOCKET)
 
     # Get current volume from alarm socket
     initial_alarm_volume = int(volume) if (volume := alarm_player.get_property("volume")) is not None else None
