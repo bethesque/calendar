@@ -24,7 +24,7 @@ def is_mpv_running(ipc_socket):
 def start_mpv(ipc_socket):
     """Start mpv with IPC if not already running."""
     if is_mpv_running(ipc_socket):
-        print("mpv {ipc_socket} is already running")
+        print(f"mpv {ipc_socket} is already running")
         return None
 
     # Remove old socket if it exists
@@ -66,7 +66,7 @@ def send_command(ipc_socket, cmd, args=None):
             s.connect(ipc_socket)
             s.sendall(message.encode("utf-8"))
     except (ConnectionRefusedError, FileNotFoundError):
-        print("mpv {ipc_socket} is not running or IPC socket missing")
+        print(f"mpv {ipc_socket} is not running or IPC socket missing")
 
 def play_alarm(file_path):
     send_command(ALARM_SOCKET, "loadfile", [file_path])
