@@ -1,5 +1,5 @@
-import time
 import logging
+from config import ALARM_SOCKET, ANNOUNCEMENT_SOCKET
 from mpv import MpvProcess, fade_out
 
 
@@ -11,9 +11,6 @@ logging.basicConfig(
             logging.StreamHandler()
         ]
     )
-
-ALARM_SOCKET = "/tmp/mpv_alarm.sock"
-ANNOUNCEMENT_SOCKET = "/tmp/mpv_announcement.sock"
 
 if __name__ == "__main__":
     alarm_player = MpvProcess(ALARM_SOCKET)

@@ -1,4 +1,5 @@
 from mpv import MpvProcess
+from config import ALARM_FILE, ALARM_SOCKET, ANNOUNCEMENT_FILE, ANNOUNCEMENT_SOCKET, SILENCE_FILE, DEFAULT_VOLUME
 import logging
 
 logging.basicConfig(
@@ -10,14 +11,6 @@ logging.basicConfig(
         ]
     )
 
-ALARM_SOCKET = "/tmp/mpv_alarm.sock"
-ANNOUNCEMENT_SOCKET = "/tmp/mpv_announcement.sock"
-
-ALARM_FILE = "audio/alarm.mp3"
-ANNOUNCEMENT_FILE = "audio/announcement.mp3"
-SILENCE_FILE = "audio/silence_5s.m4a"
-
-DEFAULT_VOLUME = 50
 
 # Note: You'll need to create a 10-second silent audio file named "silence_10s.m4a"
 # You can create one with: ffmpeg -f lavfi -i "sine=frequency=0:duration=10" -c:a aac silence_10s.m4a
