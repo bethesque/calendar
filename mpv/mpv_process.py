@@ -4,18 +4,6 @@ import json
 import socket
 import os
 
-ALARM_SOCKET = "/tmp/mpv_alarm.sock"
-ANNOUNCEMENT_SOCKET = "/tmp/mpv_announcement.sock"
-
-ALARM_FILE = "audio/alarm.mp3"
-ANNOUNCEMENT_FILE = "audio/announcement.mp3"
-SILENCE_FILE = "audio/silence_5s.m4a"
-
-DEFAULT_VOLUME = 50
-
-# Note: You'll need to create a 10-second silent audio file named "silence_10s.m4a"
-# You can create one with: ffmpeg -f lavfi -i "sine=frequency=0:duration=10" -c:a aac silence_10s.m4a
-
 class MpvProcess:
     def __init__(self, ipc_socket):
         self.ipc_socket = ipc_socket
@@ -91,6 +79,32 @@ class MpvProcess:
         except (ConnectionRefusedError, FileNotFoundError):
             print(f"mpv {self.ipc_socket} is not running or IPC socket missing")
 
+    def get_property(self, property_name):
+        """Get a property value from mpv."""
+        message = json.dumps({"command": ["get_property", property_name]}) + "\n"
+        try:
+            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
+                s.connect(self.ipc_socket)
+                s.sendall(message.encode("utf-8"))
+                # Read response
+                response = b""
+                while True:
+                    chunk = s.recv(1024)
+                    if not chunk:
+                        break
+                    response += chunk
+                    if b"\n" in response:
+                        break
+                try:
+                    data = json.loads(response.decode("utf-8").strip())
+                    if "data" in data:
+                        return data["data"]
+                except json.JSONDecodeError:
+                    pass
+        except (ConnectionRefusedError, FileNotFoundError):
+            print("mpv is not running or IPC socket missing")
+        return None            
+
     def play_file_on_loop(self, file_path):
         self.send_command("set_property", ["loop-file", "inf"])
         self.send_command("loadfile", [file_path])
@@ -104,33 +118,5 @@ class MpvProcess:
     def set_volume(self, vol):
         self.send_command("set_property", ["volume", vol])
 
-
-def play_alarms():
-    alarm_player = MpvProcess(ALARM_SOCKET)
-    announcement_player = MpvProcess(ANNOUNCEMENT_SOCKET)
-
-    alarm_player.start()
-    announcement_player.start()
-
-    if not alarm_player.wait_for_ipc(timeout=30.0):
-        print(f"Error: mpv alarm IPC socket at {ALARM_SOCKET} not ready")
-        exit(1)
-
-    if not announcement_player.wait_for_ipc(timeout=30.0):
-        print(f"Error: mpv announcement IPC socket at {ANNOUNCEMENT_SOCKET} not ready")
-        exit(1)
-
-    alarm_player.set_volume(DEFAULT_VOLUME)
-    announcement_player.set_volume(DEFAULT_VOLUME)
-
-    # Play the alarm
-    alarm_player.play_file_on_loop(ALARM_FILE)
-
-    # Start the looping announcement playlist
-    announcement_player.play_files_on_loop(ANNOUNCEMENT_FILE, SILENCE_FILE)
-
-    print("Done")
-
-# Example usage
-if __name__ == "__main__":
-    play_alarms()
+    def stop(self):
+        self.send_command("stop")    
