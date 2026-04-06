@@ -116,16 +116,13 @@ def create_announcement_playlist(announcement_file):
     send_command(ANNOUNCEMENT_SOCKET, "playlist_clear")
     
     # Add announcement file
-    send_command(ANNOUNCEMENT_SOCKET, "loadfile", [announcement_file, "append"])
+    send_command(ANNOUNCEMENT_SOCKET, "loadfile", [announcement_file, "append-play"])
     
     # Add silent audio file (you'll need to create a 10-second silent MP3)
-    send_command(ANNOUNCEMENT_SOCKET, "loadfile", [SILENCE_FILE, "append"])
+    send_command(ANNOUNCEMENT_SOCKET, "loadfile", [SILENCE_FILE, "append-play"])
     
     # Set playlist to loop infinitely
     send_command(ANNOUNCEMENT_SOCKET, "set_property", ["loop-playlist", "inf"])
-    
-    # Start playing
-    send_command(ANNOUNCEMENT_SOCKET, "playlist-play-index", [0])
 
 def set_volume(ipc_socket, vol):
     send_command(ipc_socket, "set_property", ["volume", vol])
