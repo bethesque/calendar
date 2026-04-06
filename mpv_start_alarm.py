@@ -23,7 +23,7 @@ def is_mpv_running(ipc_socket):
 
 def start_mpv(ipc_socket):
     """Start mpv with IPC if not already running."""
-    if is_mpv_running():
+    if is_mpv_running(ipc_socket):
         print("mpv is already running")
         return None
 
