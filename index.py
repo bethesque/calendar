@@ -1,13 +1,57 @@
+from email import message
 import logging
 import cherrypy
 import google_auth_oauthlib.flow
 from env import SERVER_ADDRESS, SCOPE, login_hint, ALARM_PID_FILE
 import os, signal
+from mpv import MpvProcess, fade_out
+from mpv.config import ALARM_SOCKET, ANNOUNCEMENT_SOCKET
 from log_config import setup_logging
 
 setup_logging()
 
 logger = logging.getLogger(__name__)
+
+class MpvAlarmController(object):
+    @cherrypy.expose
+    def index(self):
+        # HTML page with a single button
+        return """
+        <html>
+            <head>
+                <title>MPV Alarm Control</title>
+            </head>
+            <body>
+                <h1>MPV Alarm Control</h1>
+                <form method="post" action="/mpv_alarm/stop">
+                    <button type="submit">Stop Alarm</button>
+                </form>
+            </body>
+        </html>
+        """  
+
+    @cherrypy.expose
+    def stop(self):
+        message = ""
+
+        try:    
+            alarm_player = MpvProcess(ALARM_SOCKET)
+            announcement_player = MpvProcess(ANNOUNCEMENT_SOCKET)
+            fade_out([alarm_player, announcement_player], 3)
+            message = "Alarm stopped."
+        except Exception as e:
+            message = f"Error stopping alarm: {e}"
+        
+        logger.info(message)
+        
+        return f"""
+        <html>
+            <body>
+                <h2>{message}</h2>
+                <a href="/mpv_alarm">Go back</a>
+            </body>
+        </html>
+        """
 
 class AlarmController(object):
 
@@ -60,6 +104,7 @@ class AlarmController(object):
 
 class CalendarWebServer(object):
     alarm = AlarmController()
+    mpv_alarm = MpvAlarmController()
 
     @cherrypy.expose
     def index(self):
