@@ -89,6 +89,19 @@ def send_command(ipc_socket, cmd, args=None):
         with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
             s.connect(ipc_socket)
             s.sendall(message.encode("utf-8"))
+
+            response = b""
+            while True:
+                chunk = s.recv(1024)
+                if not chunk:
+                    break
+                response += chunk
+                if b"\n" in chunk:
+                    break
+
+        decoded = response.decode("utf-8", errors="replace").strip()
+        if decoded:
+            print(f"mpv response ({ipc_socket}): {decoded}")
     except (ConnectionRefusedError, FileNotFoundError):
         print(f"mpv {ipc_socket} is not running or IPC socket missing")
 
