@@ -37,7 +37,11 @@ class MpvAlarmController(object):
         try:    
             alarm_player = MpvProcess(ALARM_SOCKET)
             announcement_player = MpvProcess(ANNOUNCEMENT_SOCKET)
-            fade_out([alarm_player, announcement_player], 3)
+
+            # collect the players that are currently running (if the IPC socket is available)
+            players_to_fade = [player for player in [alarm_player, announcement_player] if player.is_running()]
+
+            fade_out(players_to_fade, 3)
             message = "Alarm stopped."
         except Exception as e:
             message = f"Error stopping alarm: {e}"
