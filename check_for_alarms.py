@@ -1,11 +1,12 @@
 import json
 import logging
-import sys, os
+import sys
 import argparse
-import subprocess
 from datetime import datetime, timedelta
 from log_config import setup_logging
-from env import ALARM_PID_FILE, DATA_DIRECTORY
+from env import DATA_DIRECTORY
+from mpv.config import ANNOUNCEMENT_FILE
+from bethtest import play_alarm
 
 setup_logging()
 
@@ -49,17 +50,6 @@ def alarm_player():
     else:
         raise NotImplementedError("Unsupported platform")
 
-def play_alarm():
-    logging.info("Playing alarm sound")
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    log_file = os.path.join(script_dir, "log.txt")
-    alarm_file = os.path.join(script_dir, "alarm.mp3")
-    with open(log_file, "a") as f:
-        process = subprocess.Popen([alarm_player(), alarm_file], stdout=f, stderr=subprocess.STDOUT)
-    with open(ALARM_PID_FILE, "w") as f:
-        f.write(str(process.pid))
-    logging.info("Alarm process started with PID: %d", process.pid)
-
 def log_results(results):
     for result in results:
         logging.info(
@@ -82,7 +72,7 @@ def check_for_alarms(base_time, window, calendar_data):
     log_results(results)
 
     if results:
-        play_alarm()
+        play_alarm(ANNOUNCEMENT_FILE)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Check for alarms in calendar events")

@@ -6,6 +6,8 @@ import os
 import logging
 import time
 
+logger = logging.getLogger(__name__)
+
 """
 Manages the mpv process for playing alarm and announcement sounds. Uses mpv's IPC interface to control playback and volume.
 
@@ -33,7 +35,7 @@ class MpvProcess:
     def start(self):
         """Start mpv with IPC if not already running."""
         if self.is_running():
-            logging.debug(f"mpv {self.ipc_socket} is already running")
+            logger.debug(f"mpv {self.ipc_socket} is already running")
             return None
 
         if os.path.exists(self.ipc_socket):
@@ -70,7 +72,7 @@ class MpvProcess:
         message = (json.dumps({"command": [cmd] + args}) + "\n").encode("utf-8")
         try:
             with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
-                logging.debug(f"Sending command to {self.ipc_socket}: {message}")
+                logger.debug(f"Sending command to {self.ipc_socket}: {message}")
                 s.connect(self.ipc_socket)
                 s.sendall(message)
 
@@ -85,9 +87,9 @@ class MpvProcess:
 
             decoded = response.decode("utf-8", errors="replace").strip()
             if decoded:
-                logging.debug(f"mpv response ({self.ipc_socket}): {decoded}")
+                logger.debug(f"mpv response ({self.ipc_socket}): {decoded}")
         except (ConnectionRefusedError, FileNotFoundError):
-            logging.debug(f"mpv {self.ipc_socket} is not running or IPC socket missing")
+            logger.debug(f"mpv {self.ipc_socket} is not running or IPC socket missing")
 
     def get_property(self, property_name):
         """Get a property value from mpv."""
@@ -112,7 +114,7 @@ class MpvProcess:
                 except json.JSONDecodeError:
                     pass
         except (ConnectionRefusedError, FileNotFoundError):
-            logging.debug("mpv is not running or IPC socket missing")
+            logger.debug("mpv is not running or IPC socket missing")
         return None            
 
     def play_file_on_loop(self, file_path):
@@ -139,7 +141,7 @@ def fade_out(mvp_processes, duration=2.0, steps=10):
     processes_to_fade = []
     for player in mvp_processes:
         volume = int(volume) if (volume := player.get_property("volume")) is not None else None
-        if volume is not None:
+        if volume is not None and volume > 0:
             processes_to_fade.append((player, volume))
 
     step_time = duration / steps
@@ -151,3 +153,6 @@ def fade_out(mvp_processes, duration=2.0, steps=10):
     
     for player in mvp_processes:
         player.stop()
+        logger.info("Stopped mpv player with IPC socket: %s", player.ipc_socket)
+
+      

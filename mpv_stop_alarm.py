@@ -1,6 +1,6 @@
 import logging
-from config import ALARM_SOCKET, ANNOUNCEMENT_SOCKET
-from mpv import MpvProcess, fade_out
+from mpv.config import ALARM_SOCKET, ANNOUNCEMENT_SOCKET
+from mpv.mpv import MpvProcess, fade_out
 
 
 logging.basicConfig(
@@ -11,6 +11,8 @@ logging.basicConfig(
             logging.StreamHandler()
         ]
     )
+
+logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
     alarm_player = MpvProcess(ALARM_SOCKET)
