@@ -6,6 +6,7 @@ import os
 
 IPC_SOCKET = "/tmp/mpv_socket"
 ALARM_FILES = ["welcome.mp3", "alarm.mp3"]
+DEFAULT_VOLUME = 30
 
 def is_mpv_running():
     """Return True if mpv IPC socket exists and is connectable."""
@@ -91,14 +92,16 @@ def fade_out(duration=2.0, steps=10):
         set_volume(vol)
         time.sleep(step_time)
     stop_alarm()
-    set_volume(100)  # reset volume
+    set_volume(DEFAULT_VOLUME)    
 
 # Example usage
 if __name__ == "__main__":
     mpv_proc = start_mpv()  # starts mpv if not running
     if not wait_for_ipc(timeout=10.0):
         print("Error: mpv IPC socket not ready")
-        exit(1)    
+        exit(1)
+
+    set_volume(DEFAULT_VOLUME)    
 
     print("Alternating alarm files for 20 seconds...")
     play_alarm_loop(ALARM_FILES, duration=30.0, interval=5.0)
