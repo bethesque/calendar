@@ -84,11 +84,13 @@ def wait_for_ipc(ipc_socket, timeout=2.0):
 def send_command(ipc_socket, cmd, args=None):
     if args is None:
         args = []
-    message = json.dumps({"command": [cmd] + args}) + "\n"
+    message = (json.dumps({"command": [cmd] + args}) + "\n").encode("utf-8")
     try:
         with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
+            print(f"Sending command to {ipc_socket}: {message}")
             s.connect(ipc_socket)
-            s.sendall(message.encode("utf-8"))
+            s.sendall(message)
+            
 
             response = b""
             while True:
