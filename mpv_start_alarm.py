@@ -39,7 +39,6 @@ def start_mpv(ipc_socket):
         "mpv",
         "--idle=yes",
         "--no-video",
-        "--loop-file=inf",
         f"--input-ipc-server={ipc_socket}",
         "--really-quiet"
     ])
@@ -108,6 +107,8 @@ def send_command(ipc_socket, cmd, args=None):
         print(f"mpv {ipc_socket} is not running or IPC socket missing")
 
 def play_alarm(file_path):
+    # Set playlist to loop infinitely
+    send_command(ALARM_SOCKET, "set_property", ["loop-file", "inf"])
     send_command(ALARM_SOCKET, "loadfile", [file_path])
 
 def create_announcement_playlist(announcement_file):
