@@ -14,29 +14,28 @@ logging.basicConfig(
 ALARM_SOCKET = "/tmp/mpv_alarm.sock"
 ANNOUNCEMENT_SOCKET = "/tmp/mpv_announcement.sock"
 
-def fade_out(duration=2.0, steps=10):
-    alarm_player = MpvProcess(ALARM_SOCKET)
-    announcement_player = MpvProcess(ANNOUNCEMENT_SOCKET)
-
-    # Get current volume from alarm socket
-    initial_alarm_volume = int(volume) if (volume := alarm_player.get_property("volume")) is not None else None
-
-    # Get current volume from announcement socket
-    initial_announcement_volume = int(volume) if (volume := announcement_player.get_property("volume")) is not None else None
+def fade_out(mvp_processes, duration=2.0, steps=10):
+    """
+    Gradually fade out the volume of the given mpv processes over the specified duration and steps, then stop them.
+    """
+    
+    processes_to_fade = []
+    for player in mvp_processes:
+        volume = int(volume) if (volume := player.get_property("volume")) is not None else None
+        if volume is not None:
+            processes_to_fade.append((player, volume))
 
     step_time = duration / steps
 
-    for vol in reversed(range(0, 100, 100 // steps)):
-        if initial_alarm_volume is not None and initial_alarm_volume > 0:
-            alarm_player.set_volume(initial_alarm_volume * vol // 100)
-
-        if initial_announcement_volume is not None and initial_announcement_volume > 0:
-            announcement_player.set_volume(initial_announcement_volume * vol // 100)
-        
+    for percent_vol in reversed(range(0, 100, 100 // steps)):
+        for player, volume in processes_to_fade:
+            player.set_volume(volume * percent_vol // 100)
         time.sleep(step_time)
     
-    alarm_player.stop()
-    announcement_player.stop()
+    for player in mvp_processes:
+        player.stop()
 
 if __name__ == "__main__":
-    fade_out(3)
+    alarm_player = MpvProcess(ALARM_SOCKET)
+    announcement_player = MpvProcess(ANNOUNCEMENT_SOCKET)
+    fade_out([alarm_player, announcement_player], 3)

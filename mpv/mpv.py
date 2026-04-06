@@ -5,6 +5,14 @@ import socket
 import os
 import logging
 
+"""
+Manages the mpv process for playing alarm and announcement sounds. Uses mpv's IPC interface to control playback and volume.
+
+Requires mpv with IPC support (version 0.32.0 or later). On Debian/Ubuntu, the default mpv package does not include IPC. You can install a version with IPC support using:
+
+sudo apt install mpv
+"""
+
 class MpvProcess:
     def __init__(self, ipc_socket):
         self.ipc_socket = ipc_socket
