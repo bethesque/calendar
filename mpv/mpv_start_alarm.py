@@ -37,7 +37,7 @@ def play_alarms():
     alarm_player.play_file_on_loop(ALARM_FILE)
 
     # Start the looping announcement playlist
-    announcement_player.play_files_on_loop(ANNOUNCEMENT_FILE, SILENCE_FILE)
+    announcement_player.play_files_on_loop(SILENCE_FILE, ANNOUNCEMENT_FILE)
 
     print("Done")
 
