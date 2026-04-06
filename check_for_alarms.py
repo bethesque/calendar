@@ -32,7 +32,8 @@ def find_events_in_range(events_data, start_time, end_time):
     for day in events_data:
         for event in day.get("timed_events", []):
             start_str = event.get("start_time")
-            if not start_str:
+            description = event.get("description", "")
+            if not start_str or (not description or "#alarm" not in description):
                 continue
 
             event_start = parse_iso(start_str)
