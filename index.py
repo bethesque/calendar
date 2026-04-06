@@ -4,7 +4,7 @@ import cherrypy
 import google_auth_oauthlib.flow
 from env import SERVER_ADDRESS, SCOPE, login_hint, ALARM_PID_FILE
 import os, signal
-from mpv import MpvProcess, fade_out
+from mpv.mpv import MpvProcess, fade_out
 from mpv.config import ALARM_SOCKET, ANNOUNCEMENT_SOCKET
 from log_config import setup_logging
 
