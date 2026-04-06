@@ -5,12 +5,13 @@ set -Eeuo pipefail
 echo "Checking for alarms at $(date)"
 
 # --- CONFIG ---
-if [ -z "${1:-}" ]; then
-    echo "Usage: $0 <device-mac>" >&2
+if [ -z "${2:-}" ]; then
+    echo "Usage: $0 <device-mac> <window>" >&2
     exit 1
 fi
 
 DEVICE_MAC=$1
+WINDOW=$2
 
 # --- ENV FIXES (critical for cron) ---
 export XDG_RUNTIME_DIR="/run/user/$(id -u)"
@@ -42,4 +43,4 @@ else
     echo "No Bluetooth sink found"
 fi
 
-/usr/bin/python check_for_alarms.py
+/usr/bin/python check_for_alarms.py --window "$WINDOW"
