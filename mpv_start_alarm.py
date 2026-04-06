@@ -125,7 +125,7 @@ def create_announcement_playlist(announcement_file):
     send_command(ANNOUNCEMENT_SOCKET, "set_property", ["loop-playlist", "inf"])
     
     # Start playing
-    send_command(ANNOUNCEMENT_SOCKET, "playlist_play_index", [0])
+    send_command(ANNOUNCEMENT_SOCKET, "playlist-play-index", [0])
 
 def set_volume(ipc_socket, vol):
     send_command(ipc_socket, "set_property", ["volume", vol])
