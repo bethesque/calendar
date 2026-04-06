@@ -1,4 +1,4 @@
-from mpv import mpv
+from mpv import MpvProcess
 
 ALARM_SOCKET = "/tmp/mpv_alarm.sock"
 ANNOUNCEMENT_SOCKET = "/tmp/mpv_announcement.sock"
