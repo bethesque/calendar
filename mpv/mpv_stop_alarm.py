@@ -1,5 +1,15 @@
 import time
+import logging
 from mpv import MpvProcess
+
+logging.basicConfig(
+        level=logging.DEBUG,
+        format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+        handlers=[
+            logging.StreamHandler()
+        ]
+    )
 
 ALARM_SOCKET = "/tmp/mpv_alarm.sock"
 ANNOUNCEMENT_SOCKET = "/tmp/mpv_announcement.sock"

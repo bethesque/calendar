@@ -3,6 +3,7 @@ import time
 import json
 import socket
 import os
+import logging
 
 class MpvProcess:
     def __init__(self, ipc_socket):
@@ -23,7 +24,7 @@ class MpvProcess:
     def start(self):
         """Start mpv with IPC if not already running."""
         if self.is_running():
-            print(f"mpv {self.ipc_socket} is already running")
+            logging.debug(f"mpv {self.ipc_socket} is already running")
             return None
 
         if os.path.exists(self.ipc_socket):
@@ -60,7 +61,7 @@ class MpvProcess:
         message = (json.dumps({"command": [cmd] + args}) + "\n").encode("utf-8")
         try:
             with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
-                print(f"Sending command to {self.ipc_socket}: {message}")
+                logging.debug(f"Sending command to {self.ipc_socket}: {message}")
                 s.connect(self.ipc_socket)
                 s.sendall(message)
 
@@ -75,9 +76,9 @@ class MpvProcess:
 
             decoded = response.decode("utf-8", errors="replace").strip()
             if decoded:
-                print(f"mpv response ({self.ipc_socket}): {decoded}")
+                logging.debug(f"mpv response ({self.ipc_socket}): {decoded}")
         except (ConnectionRefusedError, FileNotFoundError):
-            print(f"mpv {self.ipc_socket} is not running or IPC socket missing")
+            logging.debug(f"mpv {self.ipc_socket} is not running or IPC socket missing")
 
     def get_property(self, property_name):
         """Get a property value from mpv."""
@@ -102,7 +103,7 @@ class MpvProcess:
                 except json.JSONDecodeError:
                     pass
         except (ConnectionRefusedError, FileNotFoundError):
-            print("mpv is not running or IPC socket missing")
+            logging.debug("mpv is not running or IPC socket missing")
         return None            
 
     def play_file_on_loop(self, file_path):
