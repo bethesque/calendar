@@ -86,11 +86,11 @@ if __name__ == "__main__":
     start_mpv(ALARM_SOCKET)
     start_mpv(ANNOUNCEMENT_SOCKET)
 
-    if not wait_for_ipc(ALARM_SOCKET, timeout=10.0):
+    if not wait_for_ipc(ALARM_SOCKET, timeout=20.0):
         print("Error: mpv alarm IPC socket not ready")
         exit(1)
 
-    if not wait_for_ipc(ANNOUNCEMENT_SOCKET, timeout=10.0):
+    if not wait_for_ipc(ANNOUNCEMENT_SOCKET, timeout=20.0):
         print("Error: mpv announcement IPC socket not ready")
         exit(1)        
 
