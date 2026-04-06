@@ -6,8 +6,12 @@ import os
 
 ALARM_SOCKET = "/tmp/mpv_alarm.sock"
 ANNOUNCEMENT_SOCKET = "/tmp/mpv_announcement.sock"
-ALARM_FILES = ["announcement.mp3", "alarm.mp3"]
+ALARM_FILES = ["audio/announcement.mp3", "audio/alarm.mp3"]
+SILENCE_FILE = "audio/silence_10s.mp3"
 DEFAULT_VOLUME = 50
+
+# Note: You'll need to create a 10-second silent audio file named "silence_10s.m4a"
+# You can create one with: ffmpeg -f lavfi -i "sine=frequency=0:duration=10" -c:a aac silence_10s.m4a
 
 def is_mpv_running(ipc_socket):
     """Return True if mpv IPC socket exists and is connectable."""
@@ -71,11 +75,22 @@ def send_command(ipc_socket, cmd, args=None):
 def play_alarm(file_path):
     send_command(ALARM_SOCKET, "loadfile", [file_path])
 
-def play_announcement(file_path):
-    send_command(ANNOUNCEMENT_SOCKET, "loadfile", [file_path])    
-
-def stop_alarm(ipc_socket):
-    send_command(ipc_socket, "stop")
+def create_announcement_playlist(announcement_file):
+    """Create a looping playlist: announcement -> 10s silence -> repeat"""
+    # Clear any existing playlist
+    send_command(ANNOUNCEMENT_SOCKET, "playlist_clear")
+    
+    # Add announcement file
+    send_command(ANNOUNCEMENT_SOCKET, "loadfile", [announcement_file, "append"])
+    
+    # Add silent audio file (you'll need to create a 10-second silent MP3)
+    send_command(ANNOUNCEMENT_SOCKET, "loadfile", [SILENCE_FILE, "append"])
+    
+    # Set playlist to loop infinitely
+    send_command(ANNOUNCEMENT_SOCKET, "set_property", ["loop-playlist", "inf"])
+    
+    # Start playing
+    send_command(ANNOUNCEMENT_SOCKET, "playlist_play_index", [0])
 
 def set_volume(ipc_socket, vol):
     send_command(ipc_socket, "set_property", ["volume", vol])
@@ -96,8 +111,11 @@ if __name__ == "__main__":
 
     set_volume(ALARM_SOCKET, DEFAULT_VOLUME)    
     set_volume(ANNOUNCEMENT_SOCKET, DEFAULT_VOLUME)    
-
+    
+    # Play the alarm
     play_alarm(ALARM_FILES[1])
-    play_announcement(ALARM_FILES[0])
+
+    # Start the looping announcement playlist
+    create_announcement_playlist(ALARM_FILES[0])
 
     print("Done")
