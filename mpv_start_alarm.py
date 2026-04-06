@@ -45,6 +45,26 @@ def start_mpv(ipc_socket):
     ])
     return proc
 
+def start_mpv_2(ipc_socket):
+    """Start mpv with IPC if not already running."""
+    if is_mpv_running(ipc_socket):
+        print(f"mpv {ipc_socket} is already running")
+        return None
+
+    # Remove old socket if it exists
+    if os.path.exists(ipc_socket):
+        os.remove(ipc_socket)
+
+    proc = subprocess.Popen([
+        "mpv",
+        "--idle=yes",
+        "--no-video",
+        "--loop-playlist=inf",
+        f"--input-ipc-server={ipc_socket}",
+        "--really-quiet"
+    ])
+    return proc
+
 def wait_for_ipc(ipc_socket, timeout=2.0):
     """Wait until mpv IPC socket exists and is connectable."""
     start = time.time()
@@ -99,7 +119,7 @@ def set_volume(ipc_socket, vol):
 # Example usage
 if __name__ == "__main__":
     start_mpv(ALARM_SOCKET)
-    start_mpv(ANNOUNCEMENT_SOCKET)
+    start_mpv_2(ANNOUNCEMENT_SOCKET)
 
     if not wait_for_ipc(ALARM_SOCKET, timeout=20.0):
         print(f"Error: mpv alarm IPC socket at {ALARM_SOCKET} not ready")
