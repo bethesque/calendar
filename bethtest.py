@@ -23,9 +23,9 @@ def play_alarm(announcement_file):
     announcement_player.set_volume(DEFAULT_VOLUME)
 
     # Play the alarm
-    alarm_player.play_file_on_loop(ALARM_FILE)
+    alarm_player.play_file_on_loop(ALARM_FILE, 240)
 
     # Start the looping announcement playlist
-    announcement_player.play_files_on_loop(SILENCE_FILE, announcement_file)
+    announcement_player.play_files_on_loop(SILENCE_FILE, announcement_file, 240)
 
     logger.info("Done")  

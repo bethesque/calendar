@@ -5,6 +5,7 @@ import socket
 import os
 import logging
 import time
+from mutagen.mp3 import MP3
 
 logger = logging.getLogger(__name__)
 
@@ -117,21 +118,31 @@ class MpvProcess:
             logger.debug("mpv is not running or IPC socket missing")
         return None            
 
-    def play_file_on_loop(self, file_path):
-        self.send_command("set_property", ["loop-file", "inf"])
+    def play_file_on_loop(self, file_path, max_length):
+        num_loops = self.num_loops(max_length, file_path)        
+        self.send_command("set_property", ["loop-file", num_loops])
         self.send_command("loadfile", [file_path])
 
-    def play_files_on_loop(self, file_1, file_2):
+    def play_files_on_loop(self, file_path_1, file_path_2, max_length):
+        num_loops = self.num_loops(max_length, file_path_1, file_path_2)
         self.send_command("playlist_clear")
-        self.send_command("set_property", ["loop-playlist", "inf"])
-        self.send_command("loadfile", [file_1, "append-play"])
-        self.send_command("loadfile", [file_2, "append-play"])
+        self.send_command("set_property", ["loop-playlist", num_loops])
+        self.send_command("loadfile", [file_path_1, "append-play"])
+        self.send_command("loadfile", [file_path_2, "append-play"])
 
     def set_volume(self, vol):
         self.send_command("set_property", ["volume", vol])
 
     def stop(self):
-        self.send_command("stop")    
+        self.send_command("stop")
+
+    def num_loops(self, max_length, *file_paths):
+        total_length = sum(self.track_length(fp) for fp in file_paths)
+        return max(1, int(max_length // total_length))
+
+    def track_length(self, file_path):
+        audio = MP3(file_path)
+        return audio.info.length
 
 def fade_out(mvp_processes, duration=2.0, steps=10):
     """
@@ -154,5 +165,8 @@ def fade_out(mvp_processes, duration=2.0, steps=10):
     for player in mvp_processes:
         player.stop()
         logger.info("Stopped mpv player with IPC socket: %s", player.ipc_socket)
+        # set default volume once we've worked out how to get it from config
+
+
 
       

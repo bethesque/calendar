@@ -7,3 +7,4 @@ CherryPy==18.9.0
 requests==2.31.0
 tzdata
 black
+mutagen==1.47.0
