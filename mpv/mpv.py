@@ -4,7 +4,6 @@ import json
 import socket
 import os
 import logging
-import time
 from mutagen.mp3 import MP3
 
 logger = logging.getLogger(__name__)
@@ -97,6 +96,7 @@ class MpvProcess:
         message = json.dumps({"command": ["get_property", property_name]}) + "\n"
         try:
             with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
+                logger.debug(f"Sending command to {self.ipc_socket}: {message}")
                 s.connect(self.ipc_socket)
                 s.sendall(message.encode("utf-8"))
                 # Read response
@@ -108,12 +108,19 @@ class MpvProcess:
                     response += chunk
                     if b"\n" in response:
                         break
-                try:
-                    data = json.loads(response.decode("utf-8").strip())
-                    if "data" in data:
-                        return data["data"]
-                except json.JSONDecodeError:
-                    pass
+
+                # the data may contain multiple lines of JSON, so we need to split it and find the one that contains the "data" field
+                json_lines = response.decode("utf-8").strip().split('\n')
+                for line in json_lines:
+                    if line.strip():
+                        try:
+                            data = json.loads(line)
+                            logger.debug(f"mpv response ({self.ipc_socket}): {data}")
+                            if "data" in data:
+                                return data["data"]
+                        except json.JSONDecodeError:
+                            logger.debug(f"Failed to decode JSON response from mpv ({self.ipc_socket}): {line}")
+                logger.debug(f"Failed to decode JSON response from mpv ({self.ipc_socket}): {response.decode('utf-8')}")
         except (ConnectionRefusedError, FileNotFoundError):
             logger.debug("mpv is not running or IPC socket missing")
         return None
@@ -144,6 +151,9 @@ class MpvProcess:
         audio = MP3(file_path)
         return audio.info.length
 
+    def get_volume(self):
+        return self.get_property("volume")
+
 # This calculates the steps, but does not do the waiting, so that multiple players can be
 # faded out together without needing to use threads. The caller can call step() repeatedly
 # with a sleep in between, until it returns True to indicate it's done.
@@ -155,12 +165,14 @@ class FadeOut:
         self.mpv_process = mpv_process
         self.target_volume = target_volume
         self.num_steps = num_steps
-        self.initial_volume = int(volume) if (volume := mpv_process.get_property("volume")) is not None else None
+        self.initial_volume = int(volume) if (volume := mpv_process.get_volume()) is not None else None
         # convert this to an array of volume levels to step through, from initial_volume down to target_volume
         self.percentages = list(reversed(range(0, 100, 100 // num_steps)))
         self.current_step = 0
 
     def step(self):
+        if self.initial_volume == 0:
+            return True  # already at 0 volume, so we're done
         if self.current_step < len(self.percentages):
             percent = self.percentages[self.current_step]
             new_volume = self.initial_volume * percent // 100
@@ -172,10 +184,42 @@ class FadeOut:
             logger.info("Stopped mpv player with IPC socket: %s", self.mpv_process.ipc_socket)
             return True  # done
 
+
+class FadeUp:
+    def __init__(self, mpv_process, target_volume, num_steps=10):
+        self.mpv_process = mpv_process
+        self.target_volume = target_volume
+        self.num_steps = num_steps
+        self.last_known_volume = int(volume) if (volume := mpv_process.get_volume()) is not None else None
+        # An array of volume levels to step through, from initial_volume up to target_volume
+        self.volumes = range(self.last_known_volume, target_volume, (target_volume - self.last_known_volume) // num_steps)
+        if self.volumes[-1] != target_volume:
+            self.volumes = list(self.volumes) + [target_volume]
+        self.current_step = 0
+
+    def step(self):
+        if self.current_step < len(self.volumes):
+            # if the current volume has changed since the last step, return True to indicate we're done, as something else has changed the volume
+            current_volume = self.mpv_process.get_volume()
+            if current_volume != self.last_known_volume:
+                logger.info("Volume changed externally during fade up (from %s to %s) , stopping fade up for mpv player with IPC socket: %s", self.last_known_volume, current_volume, self.mpv_process.ipc_socket)
+                return True  # done
+            new_volume = self.volumes[self.current_step]
+            self.mpv_process.set_volume(new_volume)
+            self.last_known_volume = new_volume
+            self.current_step += 1
+            if self.current_step < len(self.volumes):
+                return False  # not done yet
+            else:
+                logger.info("Finished fading up mpv player with IPC socket: %s", self.mpv_process.ipc_socket)
+            return True
+        else:
+            return True  # done
+
 """
 Gradually fade out the volume of the given mpv processes over the specified duration and steps, then stop them.
 """
-def fade_out(mvp_processes, duration=2.0, steps=10):
+def fade_out(mvp_processes, duration, steps=10):
 
     fade_outs = []
     for player in mvp_processes:
@@ -188,3 +232,22 @@ def fade_out(mvp_processes, duration=2.0, steps=10):
             if fade.step():
                 fade_outs.remove(fade)
         time.sleep(step_time) if fade_outs else None
+
+
+"""
+Gradually fade up the volume of the given mpv processes over the specified duration and steps.
+First pararmeter is a list of tuples of (mpv_process, target_volume), so that different players can be faded up to different volumes.
+"""
+def fade_up(mvp_processes_and_target_volumes, duration, steps=10):
+
+    fade_ups = []
+    for player, target_volume in mvp_processes_and_target_volumes:
+        fade_ups.append(FadeUp(player, target_volume=target_volume, num_steps=steps))
+
+    step_time = duration / steps
+
+    while fade_ups:
+        for fade in fade_ups[:]:
+            if fade.step():
+                fade_ups.remove(fade)
+        time.sleep(step_time) if fade_ups else None

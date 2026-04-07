@@ -1,5 +1,6 @@
 import logging
-from mpv.mpv import MpvProcess
+import time
+from mpv.mpv import MpvProcess, fade_up
 from mpv.config import ALARM_FILE, ALARM_SOCKET, ANNOUNCEMENT_SOCKET, SILENCE_FILE, DEFAULT_VOLUME
 
 logger = logging.getLogger(__name__)
@@ -28,4 +29,6 @@ def play_alarm(announcement_file):
     # Start the looping announcement playlist
     announcement_player.play_files_on_loop(SILENCE_FILE, announcement_file, 240)
 
-    logger.info("Done")  
+    fade_up([(alarm_player, 80), (announcement_player, 80)], 45, 10)
+
+    logger.info("Done")
