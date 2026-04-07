@@ -68,20 +68,24 @@ Schedule the main screen update for hourly with:
 `crontab -e`
 
 ```
-# Force refresh on startup
-@reboot cd /home/thetrav/calendar && /usr/bin/python /home/thetrav/calendar/main.py --force >> /home/thetrav/calendar/log.txt
 
-# Lazy refresh once an hour if data has changed - fetch the data just before the hour in case there is an alarm
+# Lazy refresh screen once an hour if data has changed - fetch the data just before the hour in case there is an alarm
 55 * * * * cd /home/thetrav/calendar && ./main.sh
 
-# Force refresh once a minute if the token has been updated
+# Check once a minute if the token has been updated and force refresh if so
 * * * * * cd /home/thetrav/calendar && ./main-update-screen-if-token-updated.sh
 
-# Stop the log file getting too big - at 2am on a Sunday, get rid of all but the last 500 lines
+# Between 7am (inclusive) and 9pm (exclusive) check for alarms every 5 minutes from 0 to 45 minutes past the hour 
+0-45/5 7-20 * * * cd /home/thetrav/calendar && ./check_for_alarms.sh "00:02:5B:AD:85:DB" "5" >> /home/thetrav/calendar/cron.log  2>&1
+
+# Between 7am (inclusive) and 9pm (exclusive) check for alarms in a 10 minute block at 50 minutes past the hour, because we don't want to clash with the screen refresh as it could freeze the raspberry pi
+50 7-20 * * * cd /home/thetrav/calendar && ./check_for_alarms.sh "00:02:5B:AD:85:DB" "10" >> /home/thetrav/calendar/cron.log  2>&
+
+# Clean up logs
 0 2 * * 0 [ -f /home/thetrav/calendar/log.txt ] && /usr/bin/tail -n 500 /home/thetrav/calendar/log.txt > /home/thetrav/calendar/log.tmp && /bin/mv /home/thetrav/calendar/log.tmp /home/thetrav/calendar/log.txt
 
-# Check for alarms
-*/5 * * * * cd /home/thetrav/calendar && /usr/bin/python check_for_alarms.py --window 5
+# Clean up logs
+0 2 * * 0 [ -f /home/thetrav/calendar/cron.log ] && /usr/bin/tail -n 500 /home/thetrav/calendar/cron.log > /home/thetrav/calendar/cron.log.tmp && /bin/mv /home/thetrav/calendar/cron.log.tmp /home/thetrav/calendar/cron.log
 
 ```
 
