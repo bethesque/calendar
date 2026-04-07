@@ -9,3 +9,4 @@ bin
 lib
 ecalendar-last-render.json
 pyvenv.cfg
+share
