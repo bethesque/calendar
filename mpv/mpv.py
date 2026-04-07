@@ -116,10 +116,10 @@ class MpvProcess:
                     pass
         except (ConnectionRefusedError, FileNotFoundError):
             logger.debug("mpv is not running or IPC socket missing")
-        return None            
+        return None
 
     def play_file_on_loop(self, file_path, max_length):
-        num_loops = self.num_loops(max_length, file_path)        
+        num_loops = self.num_loops(max_length, file_path)
         self.send_command("set_property", ["loop-file", num_loops])
         self.send_command("loadfile", [file_path])
 
@@ -144,29 +144,47 @@ class MpvProcess:
         audio = MP3(file_path)
         return audio.info.length
 
+# This calculates the steps, but does not do the waiting, so that multiple players can be
+# faded out together without needing to use threads. The caller can call step() repeatedly
+# with a sleep in between, until it returns True to indicate it's done.
+# Could have used threads to do this, but trying to minimise resource usage on the Pi.
+# Also, this needs to be called by an HTTP endpoint, so I don't like to add extra
+# treads in an HTTP server.
+class FadeOut:
+    def __init__(self, mpv_process, target_volume, num_steps=10):
+        self.mpv_process = mpv_process
+        self.target_volume = target_volume
+        self.num_steps = num_steps
+        self.initial_volume = int(volume) if (volume := mpv_process.get_property("volume")) is not None else None
+        # convert this to an array of volume levels to step through, from initial_volume down to target_volume
+        self.percentages = list(reversed(range(0, 100, 100 // num_steps)))
+        self.current_step = 0
+
+    def step(self):
+        if self.current_step < len(self.percentages):
+            percent = self.percentages[self.current_step]
+            new_volume = self.initial_volume * percent // 100
+            self.mpv_process.set_volume(new_volume)
+            self.current_step += 1
+            return False  # not done yet
+        else:
+            self.mpv_process.stop()
+            logger.info("Stopped mpv player with IPC socket: %s", self.mpv_process.ipc_socket)
+            return True  # done
+
+"""
+Gradually fade out the volume of the given mpv processes over the specified duration and steps, then stop them.
+"""
 def fade_out(mvp_processes, duration=2.0, steps=10):
-    """
-    Gradually fade out the volume of the given mpv processes over the specified duration and steps, then stop them.
-    """
-    
-    processes_to_fade = []
+
+    fade_outs = []
     for player in mvp_processes:
-        volume = int(volume) if (volume := player.get_property("volume")) is not None else None
-        if volume is not None and volume > 0:
-            processes_to_fade.append((player, volume))
+        fade_outs.append(FadeOut(player, target_volume=0, num_steps=steps))
 
     step_time = duration / steps
 
-    for percent_vol in reversed(range(0, 100, 100 // steps)):
-        for player, volume in processes_to_fade:
-            player.set_volume(volume * percent_vol // 100)
-        time.sleep(step_time)
-    
-    for player in mvp_processes:
-        player.stop()
-        logger.info("Stopped mpv player with IPC socket: %s", player.ipc_socket)
-        # set default volume once we've worked out how to get it from config
-
-
-
-      
+    while fade_outs:
+        for fade in fade_outs[:]:
+            if fade.step():
+                fade_outs.remove(fade)
+        time.sleep(step_time) if fade_outs else None
