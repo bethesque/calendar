@@ -29,6 +29,6 @@ def play_alarm(announcement_file):
     # Start the looping announcement playlist
     announcement_player.play_files_on_loop(SILENCE_FILE, announcement_file, 240)
 
-    fade_up([(alarm_player, 80), (announcement_player, 80)], 45, 10)
+    fade_up([(alarm_player, 90), (announcement_player, 100)], 45, 10)
 
     logger.info("Done")
