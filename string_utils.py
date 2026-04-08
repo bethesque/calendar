@@ -1,4 +1,7 @@
 import re
+from datetime import datetime, date
+import dataclasses
+import json
 
 def sanitise_filename(text):
     """Convert text to a safe filename by removing/replacing unsafe characters."""
@@ -14,3 +17,15 @@ def sanitise_filename(text):
         safe_text = safe_text[:200].rstrip('_-')
 
     return safe_text
+
+def strip_ansi(text):
+    # Regex to match ANSI escape sequences
+    ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+    return ansi_escape.sub('', text)
+
+def json_default_encoder(o):
+    if isinstance(o, (date, datetime)):
+        return o.isoformat()
+    if dataclasses.is_dataclass(o):
+        return dataclasses.asdict(o)
+    return str(o)
