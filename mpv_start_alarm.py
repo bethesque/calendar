@@ -19,4 +19,4 @@ logger = logging.getLogger(__name__)
 
 # Example usage
 if __name__ == "__main__":
-    play_alarm(ANNOUNCEMENT_FILE)
+    play_alarm(["audio/test_announcement.mp3"])

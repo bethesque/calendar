@@ -130,12 +130,12 @@ class MpvProcess:
         self.send_command("set_property", ["loop-file", num_loops])
         self.send_command("loadfile", [file_path])
 
-    def play_files_on_loop(self, file_path_1, file_path_2, max_length):
-        num_loops = self.num_loops(max_length, file_path_1, file_path_2)
+    def play_files_on_loop(self, file_paths, max_length):
+        num_loops = self.num_loops(max_length, *file_paths)
         self.send_command("playlist_clear")
         self.send_command("set_property", ["loop-playlist", num_loops])
-        self.send_command("loadfile", [file_path_1, "append-play"])
-        self.send_command("loadfile", [file_path_2, "append-play"])
+        for file_path in file_paths:
+            self.send_command("loadfile", [file_path, "append-play"])
 
     def set_volume(self, vol):
         self.send_command("set_property", ["volume", vol])
@@ -147,6 +147,7 @@ class MpvProcess:
         total_length = sum(self.track_length(fp) for fp in file_paths)
         return max(1, int(max_length // total_length))
 
+    # does this need a self argument?
     def track_length(self, file_path):
         audio = MP3(file_path)
         return audio.info.length

@@ -73,7 +73,7 @@ def check_for_alarms(base_time, window, calendar_data):
     log_results(results)
 
     if results:
-        play_alarm(ANNOUNCEMENT_FILE)
+        play_alarm([ANNOUNCEMENT_FILE])
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Check for alarms in calendar events")
@@ -94,5 +94,5 @@ if __name__ == "__main__":
     base_time = args.base_time or datetime.now().astimezone()
     calendar_data_file_path = DATA_DIRECTORY + "/ecalendar-last-render.json"
     calendar_data = load_events(calendar_data_file_path)
-    
+
     check_for_alarms(base_time, args.window, calendar_data)
