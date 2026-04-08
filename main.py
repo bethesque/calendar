@@ -1,7 +1,7 @@
 from google_calendar import CalendarSource
 from layout import layout_calendars
 from model import Surface
-from screen import hardware_render
+from hardware_screen import hardware_render
 from qr import make_qr_code
 import json
 from datetime import datetime

@@ -4,7 +4,7 @@ sys.path.append(os.path.abspath(os.path.join(__file__, "..", "..", "..")))
 
 from qr import make_qr_code
 from model import Surface
-from screen import hardware_render
+from hardware_screen import hardware_render
 from env import IS_LOCAL
 
 

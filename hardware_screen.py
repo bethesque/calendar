@@ -1,4 +1,3 @@
-from model import Surface
 import time
 import logging
 
