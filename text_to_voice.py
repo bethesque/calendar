@@ -13,11 +13,11 @@ from env import CACHE_DIRECTORY
 Converts text to a voice file and saves it to the cache directory.
 Returns the path to the saved audio file.
 """
-def text_to_voice_file(text):
+def text_to_voice_file(text, cache_directory=CACHE_DIRECTORY):
     # Take first 20 words to avoid long processing times and large audio files
     words = text.split()
     truncated_text = " ".join(words[:20])
-    audio_file_path = os.path.join(CACHE_DIRECTORY, sanitise_filename(truncated_text) + ".mp3")
+    audio_file_path = os.path.join(cache_directory, "audio", sanitise_filename(truncated_text) + ".mp3")
     # if the file already exists, return it
     if os.path.exists(audio_file_path):
         logger.debug("Audio file already exists for text: %s, returning existing file: %s", truncated_text, audio_file_path)
@@ -28,7 +28,7 @@ def text_to_voice_file(text):
         tts = gTTS(truncated_text, timeout=5)
 
         # Ensure the cache directory exists
-        os.makedirs(CACHE_DIRECTORY, exist_ok=True)
+        os.makedirs(os.path.dirname(audio_file_path), exist_ok=True)
         tts.save(audio_file_path)
     except Exception as e:
         logger.error(f"Error generating TTS for text: {truncated_text}. Error: {e}")
