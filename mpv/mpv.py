@@ -203,7 +203,7 @@ class FadeUp:
             # if the current volume has changed since the last step, return True to indicate we're done, as something else has changed the volume
             current_volume = self.mpv_process.get_volume()
             if current_volume != self.last_known_volume:
-                logger.info("Volume changed externally during fade up (from %s to %s) , stopping fade up for mpv player with IPC socket: %s", self.last_known_volume, current_volume, self.mpv_process.ipc_socket)
+                logger.debug("Volume changed externally during fade up (from %s to %s), stopping fade up for mpv player with IPC socket: %s", self.last_known_volume, current_volume, self.mpv_process.ipc_socket)
                 return True  # done
             new_volume = self.volumes[self.current_step]
             self.mpv_process.set_volume(new_volume)
