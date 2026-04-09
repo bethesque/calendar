@@ -18,6 +18,7 @@ class AlarmController(object):
         return """
         <html>
             <head>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>Alarm Control</title>
             </head>
             <body>
@@ -49,6 +50,10 @@ class AlarmController(object):
 
         return f"""
         <html>
+            <head>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Alarm Control</title>
+            </head>
             <body>
                 <h2>{message}</h2>
                 <a href="/alarm">Go back</a>
