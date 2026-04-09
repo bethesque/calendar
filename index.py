@@ -2,8 +2,8 @@ import logging
 import cherrypy
 import google_auth_oauthlib.flow
 from env import SERVER_ADDRESS, SCOPE, login_hint
-from mpv.mpv import MpvProcess, fade_out
-from mpv.config import ALARM_SOCKET, ANNOUNCEMENT_SOCKET
+from ecal.alarms.mpv.mpv import MpvProcess, fade_out
+from ecal.alarms.mpv.config import ALARM_SOCKET, ANNOUNCEMENT_SOCKET
 from log_config import setup_logging
 
 setup_logging()
@@ -27,13 +27,13 @@ class AlarmController(object):
                 </form>
             </body>
         </html>
-        """  
+        """
 
     @cherrypy.expose
     def stop(self):
         message = ""
 
-        try:    
+        try:
             alarm_player = MpvProcess(ALARM_SOCKET)
             announcement_player = MpvProcess(ANNOUNCEMENT_SOCKET)
 
@@ -44,9 +44,9 @@ class AlarmController(object):
             message = "Alarm stopped."
         except Exception as e:
             message = f"Error stopping alarm: {e}"
-        
+
         logger.info(message)
-        
+
         return f"""
         <html>
             <body>
