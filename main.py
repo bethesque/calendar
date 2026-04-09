@@ -1,4 +1,4 @@
-from google_calendar import CalendarSource
+from ecal.google_calendar import CalendarSource
 from layout import layout_calendars
 from model import Surface
 from hardware_screen import hardware_render

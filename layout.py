@@ -1,5 +1,5 @@
 from rendering import *
-from google_calendar import CalendarDay, Event, WeatherForecast
+from ecal.google_calendar import CalendarDay, Event, WeatherForecast
 
 weekdays = [
     "Monday",
@@ -20,7 +20,7 @@ def layout_calendars(calendars: list[CalendarDay], surface):
     draw = ImageDraw.Draw(image)
     box = EqualChildrenBox(padding=5, stroke=0)
     h1_font = font(size=FONT_SIZE_H1)
-    
+
 
     for day in calendars:
         day_box = StackChildrenBox(padding=5, stroke=0, horizontal=False)

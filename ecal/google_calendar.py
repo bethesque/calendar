@@ -13,7 +13,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-from weather_forecast import TSHIRT_AND_SHORTS_ICON_PATH, choose_clothing_icon
+from ecal.weather_forecast import TSHIRT_AND_SHORTS_ICON_PATH, choose_clothing_icon
 
 
 # If modifying these scopes, delete the file token.json.
@@ -109,7 +109,7 @@ def list_google_events(creds, calendar_id, min, max):
 
 def add_events_to_calendars(events_from_google, calendar_name, displayed_calendar_days):
     for event_dict in events_from_google:
-        
+
         matched_days = [d for d in displayed_calendar_days if displayed_day_includes_event(d, event_dict)]
 
         for matched_day in matched_days:
@@ -129,16 +129,16 @@ def is_weather_forecast(event_dict):
 def build_event(event_dict, calendar_name):
     if is_weather_forecast(event_dict):
         return WeatherForecast(
-            owner=calendar_name, 
-            summary=event_dict["summary"], 
-            description="", 
+            owner=calendar_name,
+            summary=event_dict["summary"],
+            description="",
             image_path=choose_clothing_icon(event_dict["summary"]),
         )
     else:
         return Event(
-            owner=calendar_name, 
-            summary=event_dict["summary"], 
-            description=event_dict.get("description"), 
+            owner=calendar_name,
+            summary=event_dict["summary"],
+            description=event_dict.get("description"),
             recurring=bool(event_dict.get("recurringEventId")),
         )
 
@@ -164,7 +164,7 @@ def displayed_day_includes_event(displayed_calendar_day, event_dict):
     if end_date_time.tzinfo is None:
         end_date_time = end_date_time.replace(tzinfo=ZoneInfo(TIMEZONE))
 
-    return displayed_calendar_day.date == start_date or ( start_date < displayed_calendar_day.date and displayed_calendar_day.date_time < end_date_time )     
+    return displayed_calendar_day.date == start_date or ( start_date < displayed_calendar_day.date and displayed_calendar_day.date_time < end_date_time )
 
 
 def get_calendars(creds, filter):
@@ -176,7 +176,7 @@ def get_calendars(creds, filter):
     tomorrow = start_of_today + datetime.timedelta(days=1)
     end_of_tomorrow = tomorrow + datetime.timedelta(days=1) - datetime.timedelta(seconds=1)
     displayed_calendar_days = [CalendarDay(date=start_of_today.date()), CalendarDay(date=tomorrow.date())]
-    
+
     for cal_id, display_name in filter:
         gcal = google_calendars_by_id[cal_id]
         if gcal:

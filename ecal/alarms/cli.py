@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 def test_alarm():
     try:
+        print("Testing alarm... press Ctrl+C to stop")
         play_alarm(["audio/test_announcement.mp3"])
     except KeyboardInterrupt as e:
         alarm_player = MpvProcess(ALARM_SOCKET)
