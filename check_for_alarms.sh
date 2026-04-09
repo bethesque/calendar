@@ -10,37 +10,9 @@ if [ -z "${2:-}" ]; then
     exit 1
 fi
 
-DEVICE_MAC=$1
-WINDOW=$2
+export DEVICE_MAC="$1"
+WINDOW="$2"
 
-# --- ENV FIXES (critical for cron) ---
-export XDG_RUNTIME_DIR="/run/user/$(id -u)"
-export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"
-
-# --- Wait for Bluetooth service ---
-sudo systemctl start bluetooth
-sleep 5
-
-# --- Connect Bluetooth device ---
-for i in {1..5}; do
-    echo -e "connect $DEVICE_MAC\nquit" | bluetoothctl
-    sleep 2
-    
-    if pactl list short sinks | grep -q bluez; then
-        break
-    fi
-done
-
-# --- Wait for connection to settle ---
-sleep 5
-
-# --- Set PulseAudio sink ---
-SINK=$(pactl list short sinks | grep bluez | awk '{print $2}' | head -n1)
-
-if [ -n "$SINK" ]; then
-    pactl set-default-sink "$SINK"
-else
-    echo "No Bluetooth sink found"
-fi
+./script/connect_bluetooth_speaker.sh
 
 /usr/bin/python check_for_alarms.py --window "$WINDOW"
