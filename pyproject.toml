@@ -14,7 +14,7 @@ readme = "README.md"
 requires-python = ">=3.9.2"
 license = "MIT"
 authors = [
-  {name = "Travis Dixon", email = "jane@example.com"},
+  {name = "Travis Dixon", email = "the.trav@gmail.com"},
   {name = "Beth Skurrie", email = "beth@bethesque.com"},
 ]
 keywords = []
