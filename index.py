@@ -4,7 +4,7 @@ import google_auth_oauthlib.flow
 from env import SERVER_ADDRESS, SCOPE, login_hint
 from ecal.alarms.mpv import MpvProcess, fade_out
 from ecal.alarms import ALARM_SOCKET, ANNOUNCEMENT_SOCKET
-from log_config import setup_logging
+from ecal.log_config import setup_logging
 
 setup_logging()
 

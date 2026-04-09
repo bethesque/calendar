@@ -3,7 +3,7 @@ import logging
 import os
 import argparse
 from datetime import datetime
-from log_config import setup_logging
+from ecal.log_config import setup_logging
 from env import DATA_DIRECTORY
 from ecal.alarms.alarm import check_for_alarms
 
