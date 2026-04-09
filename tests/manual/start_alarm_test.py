@@ -5,7 +5,7 @@ from ecal.alarms import ALARM_SOCKET, ANNOUNCEMENT_SOCKET
 sys.path.append(os.path.abspath(os.path.join(__file__, "..", "..", "..")))
 
 from ecal.alarms.alarm import play_alarm
-from ecal.alarms.mpv.mpv import MpvProcess, fade_out
+from ecal.alarms.mpv import MpvProcess, fade_out
 import logging
 
 logging.basicConfig(

@@ -2,7 +2,7 @@ import logging
 from datetime import datetime, timedelta
 
 from ecal.alarms.text_to_voice import text_to_voice_file
-from ecal.alarms.mpv.mpv import MpvProcess, fade_up
+from ecal.alarms.mpv import MpvProcess, fade_up
 from ecal.alarms import ALARM_FILE, ALARM_SOCKET, ANNOUNCEMENT_SOCKET, SILENCE_FILE, DEFAULT_VOLUME
 
 logger = logging.getLogger(__name__)
