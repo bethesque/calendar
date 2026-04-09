@@ -5,7 +5,7 @@ import logging
 sys.path.append(os.path.abspath(os.path.join(__file__, "..", "..", "..")))
 
 
-from ecal.alarms.mpv.config import ALARM_SOCKET, ANNOUNCEMENT_SOCKET
+from ecal.alarms import ALARM_SOCKET, ANNOUNCEMENT_SOCKET
 from ecal.alarms.mpv.mpv import MpvProcess, fade_out
 
 logging.basicConfig(
