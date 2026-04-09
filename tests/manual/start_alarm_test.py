@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(__file__, "..", "..", "..")))
 
-from alarms import play_alarm
+from ecal.alarms.alarm import play_alarm
 import logging
 
 logging.basicConfig(
