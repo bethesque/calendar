@@ -1,9 +1,9 @@
-from env import DATA_DIRECTORY
+from ecal.env import DATA_DIRECTORY
 from google_calendar import CalendarSource
 import json
 from datetime import datetime, date
 import dataclasses
-from env import filter
+from ecal.env import filter
 
 """
 This script refreshes the calendar data and saves it to a local file. It is for dev and test only.

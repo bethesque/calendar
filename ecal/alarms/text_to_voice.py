@@ -7,7 +7,7 @@ DEFAULT_ANNOUCEMENT_FILE = "audio/default_announcement.mp3"
 
 logger = logging.getLogger(__name__)
 
-from env import CACHE_DIRECTORY
+from ecal.env import CACHE_DIRECTORY
 
 """
 Converts text to a voice file and saves it to the cache directory.

@@ -1,7 +1,7 @@
 import logging
 import cherrypy
 import google_auth_oauthlib.flow
-from env import SERVER_ADDRESS, SCOPE, login_hint
+from ecal.env import SERVER_ADDRESS, SCOPE, login_hint
 from ecal.alarms.mpv import MpvProcess, fade_out
 from ecal.alarms import ALARM_SOCKET, ANNOUNCEMENT_SOCKET
 from ecal.log_config import setup_logging

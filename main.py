@@ -6,7 +6,7 @@ from qr import make_qr_code
 import json
 from datetime import datetime
 from ecal.string_utils import json_default_encoder
-from env import filter, SERVER_ADDRESS, DATA_DIRECTORY, IS_LOCAL, STUB_DATA
+from ecal.env import filter, SERVER_ADDRESS, DATA_DIRECTORY, IS_LOCAL, STUB_DATA
 from ecal.log_config import setup_logging
 import logging
 import sys
