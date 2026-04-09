@@ -65,7 +65,7 @@ pip install -r requirements.txt
 
 ## scheduling
 
-Schedule the screen and alarm tasks with `crontab -e crontab.txt`.
+Schedule the screen and alarm tasks with `crontab crontab.txt`.
 
 ## web server
 
