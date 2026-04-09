@@ -13,7 +13,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-from ecal.weather_forecast import TSHIRT_AND_SHORTS_ICON_PATH, choose_clothing_icon
+from ecal.screen.weather_forecast import choose_clothing_icon
 
 
 # If modifying these scopes, delete the file token.json.
