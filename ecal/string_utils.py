@@ -1,7 +1,6 @@
 import re
 from datetime import datetime, date
 import dataclasses
-import json
 
 def sanitise_filename(text):
     """Convert text to a safe filename by removing/replacing unsafe characters."""

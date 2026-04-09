@@ -1,4 +1,4 @@
-from string_utils import sanitise_filename
+from ecal.string_utils import sanitise_filename
 from gtts import gTTS
 import os
 import logging
