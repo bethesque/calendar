@@ -47,12 +47,12 @@ instructions here:
 https://www.waveshare.com/wiki/12.48inch_e-Paper_Module_(B)#Install_Python_Library
 
 ## pip
-python dependencies are managed in `requirements.txt`
+python dependencies are managed in `pyproject.toml`
+
 when in venv mode install using:
 ```
-pip install -r requirements.txt
+pip install -e .
 ```
-TODO: add waveshare dependencies to requirements.txt
 
 # Runtime
 
@@ -60,7 +60,7 @@ git clone or copy this repo to the rasberry pi.  I keep mine in /home/thetrav/ca
 
 install dependencies with:
 ```
-pip install -r requirements.txt
+pip install -e .
 ```
 
 ## scheduling
@@ -82,6 +82,12 @@ I hit enter for all params except common name, where I enter the rasberry pi's i
 
 
 ## Python app server
+
+For local dev run:
+
+```
+python index.py
+```
 
 The server invokes a locally running cherryPi app which needs to be set up as service with:
 ```
