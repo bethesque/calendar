@@ -13,4 +13,4 @@ export DEVICE_MAC=$1
 
 script/connect_bluetooth_speaker.sh
 
-/usr/bin/python start_alarm_test.py
+/usr/bin/python tests/manual/start_alarm_test.py
