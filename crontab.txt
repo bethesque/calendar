@@ -1,0 +1,48 @@
+# Edit this file to introduce tasks to be run by cron.
+#
+# Each task to run has to be defined through a single line
+# indicating with different fields when the task will be run
+# and what command to run for the task
+#
+# To define the time you can provide concrete values for
+# minute (m), hour (h), day of month (dom), month (mon),
+# and day of week (dow) or use '*' in these fields (for 'any').
+#
+# Notice that tasks will be started based on the cron's system
+# daemon's notion of time and timezones.
+#
+# Output of the crontab jobs (including errors) is sent through
+# email to the user the crontab file belongs to (unless redirected).
+#
+# For example, you can run a backup of all your user accounts
+# at 5 a.m every week with:
+# 0 5 * * 1 tar -zcf /var/backups/home.tgz /home/
+#
+# For more information see the manual pages of crontab(5) and cron(8)
+#
+# m h  dom mon dow   command
+
+# ====== SCREEN ======
+
+# Lazy refresh screen once an hour if data has changed - fetch the data just before the hour in case there is an alarm
+55 * * * * cd /home/thetrav/calendar && ./script/main.sh
+
+# Check once a minute if the token has been updated and force refresh if so
+* * * * * cd /home/thetrav/calendar && ./script/main-update-screen-if-token-updated.sh
+
+# ====== ALARMS ======
+
+# Between 7am (inclusive) and 9pm (exclusive) check for alarms every 5 minutes from 0 to 45 minutes past the hour
+0-45/5 7-20 * * * cd /home/thetrav/calendar && ./script/check_for_alarms.sh "00:02:5B:AD:85:DB" "5" >> /home/thetrav/calendar/cron.log  2>&1
+
+# Between 7am (inclusive) and 9pm (exclusive) check for alarms in a 10 minute block at 50 minutes past the hour,
+# because we don't want to clash with the screen refresh as it could freeze the raspberry pi
+50 7-20 * * * cd /home/thetrav/calendar && ./script/check_for_alarms.sh "00:02:5B:AD:85:DB" "10" >> /home/thetrav/calendar/cron.log  2>&
+
+# ====== LOGS ======
+
+# Clean up app logs on Sunday mornings
+0 2 * * 0 [ -f /home/thetrav/calendar/log.txt ] && /usr/bin/tail -n 500 /home/thetrav/calendar/log.txt > /home/thetrav/calendar/log.tmp && /bin/mv /home/thetrav/calendar/log.tmp /home/thetrav/calendar/log.txt
+
+# Clean up cron logs on Sunday mornings
+0 2 * * 0 [ -f /home/thetrav/calendar/cron.log ] && /usr/bin/tail -n 500 /home/thetrav/calendar/cron.log > /home/thetrav/calendar/cron.log.tmp && /bin/mv /home/thetrav/calendar/cron.log.tmp /home/thetrav/calendar/cron.log
