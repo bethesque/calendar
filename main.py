@@ -1,6 +1,6 @@
 from ecal.google_calendar import CalendarSource
 from ecal.screen.layout import layout_calendars
-from model import Surface
+from ecal.screen.model import Surface
 from ecal.screen.hardware_screen import hardware_render
 from ecal.screen.qr import make_qr_code
 import json

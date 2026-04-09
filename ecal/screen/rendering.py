@@ -1,6 +1,6 @@
 from PIL import Image, ImageDraw, ImageFont
 from dataclasses import dataclass, field
-from model import Surface
+from ecal.screen.model import Surface
 
 # FONT_SIZE_H1 = 50
 # FONT_SIZE_DEFAULT = 24
@@ -51,7 +51,7 @@ def important_font(size=FONT_SIZE_DEFAULT):
     return ImageFont.truetype(BOLD_FONT_FILE, size)
 
 def important_font(size=FONT_SIZE_DEFAULT):
-    return ImageFont.truetype(BOLD_FONT_FILE, size)    
+    return ImageFont.truetype(BOLD_FONT_FILE, size)
 
 
 def find_break_index(line, font, pixel_width):
