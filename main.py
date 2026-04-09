@@ -1,8 +1,8 @@
 from ecal.google_calendar import CalendarSource
 from layout import layout_calendars
 from model import Surface
-from hardware_screen import hardware_render
-from qr import make_qr_code
+from ecal.screen.hardware_screen import hardware_render
+from ecal.screen.qr import make_qr_code
 import json
 from datetime import datetime
 from ecal.string_utils import json_default_encoder

@@ -2,9 +2,9 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(__file__, "..", "..", "..")))
 
-from qr import make_qr_code
+from ecal.screen.qr import make_qr_code
 from model import Surface
-from hardware_screen import hardware_render
+from ecal.screen.hardware_screen import hardware_render
 from ecal.env import IS_LOCAL
 
 

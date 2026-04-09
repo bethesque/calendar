@@ -1,4 +1,4 @@
-from rendering import *
+from ecal.screen.rendering import *
 from ecal.google_calendar import CalendarDay, Event, WeatherForecast
 
 weekdays = [
