@@ -2,6 +2,10 @@ import subprocess
 import time
 import os
 
+"""
+Not currently used. Shell script is used instead.
+"""
+
 DEVICE_MAC = os.environ['BLUETOOTH_SPEAKER_MAC']
 
 def run(cmd):

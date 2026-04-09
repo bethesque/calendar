@@ -36,7 +36,7 @@ source .venv/bin/activate
 
 
 ## system
-The thing requires a few system dependencies.  
+The thing requires a few system dependencies.
 This is really only relevant on the pi itself, which is running a debian thingy, so apt-get with:
 ```
 TODO: add system dependencies
@@ -70,16 +70,16 @@ Schedule the main screen update for hourly with:
 ```
 
 # Lazy refresh screen once an hour if data has changed - fetch the data just before the hour in case there is an alarm
-55 * * * * cd /home/thetrav/calendar && ./main.sh
+55 * * * * cd /home/thetrav/calendar && ./script/main.sh
 
 # Check once a minute if the token has been updated and force refresh if so
-* * * * * cd /home/thetrav/calendar && ./main-update-screen-if-token-updated.sh
+* * * * * cd /home/thetrav/calendar && ./script/main-update-screen-if-token-updated.sh
 
-# Between 7am (inclusive) and 9pm (exclusive) check for alarms every 5 minutes from 0 to 45 minutes past the hour 
-0-45/5 7-20 * * * cd /home/thetrav/calendar && ./check_for_alarms.sh "00:02:5B:AD:85:DB" "5" >> /home/thetrav/calendar/cron.log  2>&1
+# Between 7am (inclusive) and 9pm (exclusive) check for alarms every 5 minutes from 0 to 45 minutes past the hour
+0-45/5 7-20 * * * cd /home/thetrav/calendar && ./script/check_for_alarms.sh "00:02:5B:AD:85:DB" "5" >> /home/thetrav/calendar/cron.log  2>&1
 
 # Between 7am (inclusive) and 9pm (exclusive) check for alarms in a 10 minute block at 50 minutes past the hour, because we don't want to clash with the screen refresh as it could freeze the raspberry pi
-50 7-20 * * * cd /home/thetrav/calendar && ./check_for_alarms.sh "00:02:5B:AD:85:DB" "10" >> /home/thetrav/calendar/cron.log  2>&
+50 7-20 * * * cd /home/thetrav/calendar && ./script/check_for_alarms.sh "00:02:5B:AD:85:DB" "10" >> /home/thetrav/calendar/cron.log  2>&
 
 # Clean up logs
 0 2 * * 0 [ -f /home/thetrav/calendar/log.txt ] && /usr/bin/tail -n 500 /home/thetrav/calendar/log.txt > /home/thetrav/calendar/log.tmp && /bin/mv /home/thetrav/calendar/log.tmp /home/thetrav/calendar/log.txt
@@ -130,7 +130,7 @@ journalctl -f
 
 ## Google Authentication
 
-The app will require client_secret.json in the project root.  
+The app will require client_secret.json in the project root.
 You can download that file from google.
 They have a tutorial here: https://developers.google.com/identity/protocols/oauth2/web-server
 getting the API set up is part of the pre-requisites.

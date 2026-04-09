@@ -1,4 +1,5 @@
 #!/bin/bash
+# Run from project root. This script is intended to be run from a cron job to check for upcoming alarms and trigger the bluetooth connection and alarm logic if any are found.
 
 set -Eeuo pipefail
 
