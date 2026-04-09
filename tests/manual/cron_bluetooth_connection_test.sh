@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 # Run this file from the project root within a cron job to test that the bluetooth
 # connection logic works correctly when run in a non-interactive environment.
 
