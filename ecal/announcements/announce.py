@@ -24,7 +24,7 @@ def announce(calendar_file=DATA_FILE):
 
 def play_morning_summary_announcement(announcement_file=ANNOUNCEMENT_FILE):
     alarm_process, announcement_process = prepare_mvp_processes()
-    alarm_process.set_volume(DEFAULT_VOLUME * .50)
+    alarm_process.set_volume(DEFAULT_VOLUME * .60)
     alarm_process.play_file(ANNOUNCEMENT_BACKGROUND_MUSIC)
     announcement_process.play_files([SILENCE, announcement_file])
 

@@ -50,6 +50,7 @@ ecal-alarm-test = "ecal.alarms.cli:test_alarm"
 ecal-alarm-check = "ecal.alarms.cli:check_alarms"
 
 ecal-announce = "ecal.announcements.announce:announce" # Morning summary announcement
+ecal-announce-cached = "ecal.announcements.announce:play_morning_summary_announcement" # Play the cached voice file
 
 ecal-data-refresh = "ecal.cli:refresh_calendar_data"
 
