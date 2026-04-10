@@ -5,7 +5,6 @@ set -Eeuo pipefail
 
 echo "Morning announcements at $(date)"
 
-export DEVICE_MAC="$1"
 export PATH="/home/$(id -un)/.local/bin:${PATH}"
 
 source .env
