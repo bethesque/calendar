@@ -6,6 +6,7 @@ import os.path
 from dataclasses import dataclass, field
 from operator import attrgetter
 import logging
+import json
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -14,7 +15,6 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 from ecal.screen.weather_forecast import choose_clothing_icon
-
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
@@ -193,6 +193,37 @@ def get_calendars(creds, filter):
         cal.timed_events.sort(key=attrgetter("start_time"))
     return displayed_calendar_days
 
+# Load calendar data from a JSON file.
+def load_data_from_file(file_path):
+    with open(file_path, "r") as f:
+        days = json.load(f)
+        calendar_days = []
+        for day in days:
+            whole_day_events = [load_event(event) for event in day["whole_day_events"]]
+            print(f"Loaded whole_day_events: {whole_day_events}")
+            timed_events = [load_event(event) for event in day["timed_events"]]
+            calendar_day = CalendarDay(
+                date=datetime.date.fromisoformat(day["date"]),
+                whole_day_events=whole_day_events,
+                timed_events=timed_events,
+            )
+            calendar_days.append(calendar_day)
+        return calendar_days
+
+# Load event from dict from a JSON file
+def load_event(event_dict):
+    event_args = { **event_dict }
+
+    if event_args.get("start_time"):
+        event_args["start_time"] = datetime.datetime.fromisoformat(event_args.get("start_time"))
+
+    if event_args.get("end_time"):
+        event_args["end_time"] = datetime.datetime.fromisoformat(event_args.get("end_time"))
+
+    if is_weather_forecast(event_dict):
+        return WeatherForecast(**event_args)
+    else:
+        return Event(**event_args)
 
 def test_data():
     today = datetime.datetime.combine(
@@ -238,11 +269,13 @@ class CalendarSource:
             return FakeCreds(valid=True)
         return load_google_creds()
 
-    def load_data(self, creds, filter):
+    def fetch_data(self, creds, filter):
         if self.stubbed:
             return test_data()
         return get_calendars(creds, filter)
 
+    def load_data_from_file(self, file_path):
+        return load_data_from_file(file_path)
 
 if __name__ == "__main__":
     print(f"calendars: {get_calendars()}")

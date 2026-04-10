@@ -50,6 +50,7 @@ ecal-alarm-test = "ecal.alarms.cli:test_alarm"
 ecal-alarm-check = "ecal.alarms.cli:check_alarms"
 ecal-data-refresh = "ecal.cli:refresh_calendar_data"
 ecal-screen-clear = "ecal.screen.cli:clear_screen"
+ecal-screen-render = "ecal.screen.cli:render"
 
 
 [tool.setuptools]

@@ -9,3 +9,4 @@ class Surface:
     WHITE  = 0xffffff   #   01
     YELLOW = 0x00ffff   #   10
     RED    = 0x0000ff   #   11
+    DEFAULT_DIMENSIONS = (0, 0, 1304, 984)

@@ -13,7 +13,7 @@ weekdays = [
 LEFT_WIDTH = 90
 
 
-def layout_calendars(calendars: list[CalendarDay], surface):
+def layout_calendars(calendar_days: list[CalendarDay], surface):
     image = Image.new(
         "RGB", (surface.right, surface.bottom), surface.BLACK
     )  # 255: clear the frame
@@ -22,7 +22,7 @@ def layout_calendars(calendars: list[CalendarDay], surface):
     h1_font = font(size=FONT_SIZE_H1)
 
 
-    for day in calendars:
+    for day in calendar_days:
         day_box = StackChildrenBox(padding=5, stroke=0, horizontal=False)
         day_box.children.append(
             Text(

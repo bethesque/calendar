@@ -1,7 +1,29 @@
 import logging
 import platform
+from ecal.env import DATA_DIRECTORY, STUB_DATA, IS_LOCAL
+from ecal.google_calendar import CalendarSource
+from ecal.screen.image import local_render
+from ecal.screen.hardware_screen import hardware_render
+from ecal.screen.layout import layout_calendars
+from ecal.screen.model import Surface
+from ecal.log_config import setup_logging
 
-logging.basicConfig(level=logging.DEBUG)
+DATA_FILE = DATA_DIRECTORY + "/ecalendar-last-render.json"
+
+setup_logging()
+
+"""
+Load the existing calendar data from the local file and render it.
+This is for dev and test only, to make it easier to iterate on the
+screen layout without having to fetch data from the Google Calendar API every time.
+"""
+def render():
+    calendar_source = CalendarSource(stubbed=False)
+    calendar_data = calendar_source.load_data_from_file(DATA_FILE)
+    renderer = local_render if IS_LOCAL else hardware_render
+    surface = Surface(*Surface.DEFAULT_DIMENSIONS)
+    image = layout_calendars(calendar_data, surface)
+    renderer(image)
 
 def clear_screen():
         # if is mac

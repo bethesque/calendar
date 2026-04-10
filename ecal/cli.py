@@ -14,7 +14,7 @@ def refresh_calendar_data():
     print(f"Refreshing calendar data in {DATA_FILE}...")
     calendar_source = CalendarSource(stubbed=False)
     creds = calendar_source.load_creds()
-    calendars = calendar_source.load_data(creds, filter)
+    calendars = calendar_source.fetch_data(creds, filter)
     data_json = json.dumps(calendars, sort_keys=True, default=json_default_encoder)
 
     with open(DATA_FILE, "w") as f:
