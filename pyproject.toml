@@ -49,6 +49,8 @@ ecal-alarm-stop = "ecal.alarms.cli:stop_alarm"
 ecal-alarm-test = "ecal.alarms.cli:test_alarm"
 ecal-alarm-check = "ecal.alarms.cli:check_alarms"
 
+ecal-announce = "ecal.announcements.announce:announce" # Morning summary announcement
+
 ecal-data-refresh = "ecal.cli:refresh_calendar_data"
 
 ecal-screen-render = "ecal.screen.cli:render" # Render the screen using the cached calendar data

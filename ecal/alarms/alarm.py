@@ -8,6 +8,18 @@ from ecal.alarms import ALARM_FILE, ALARM_SOCKET, ANNOUNCEMENT_SOCKET, SILENCE_F
 logger = logging.getLogger(__name__)
 
 def play_alarm(announcement_files):
+    alarm_player, announcement_player = prepare_mvp_processes()
+
+    # Play the alarm track
+    alarm_player.play_file_on_loop(ALARM_FILE, 240)
+
+    # Start the looping announcement playlist
+    announcement_player.play_files_on_loop([SILENCE_FILE] + announcement_files, 240)
+
+    # Fade up to max volume over 45 seconds
+    fade_up([(alarm_player, 90), (announcement_player, 100)], 45, 10)
+
+def prepare_mvp_processes():
     # Make sure the mpv processes are started and ready
     alarm_player = MpvProcess(ALARM_SOCKET)
     announcement_player = MpvProcess(ANNOUNCEMENT_SOCKET)
@@ -27,14 +39,8 @@ def play_alarm(announcement_files):
     alarm_player.set_volume(DEFAULT_VOLUME)
     announcement_player.set_volume(DEFAULT_VOLUME)
 
-    # Play the alarm track
-    alarm_player.play_file_on_loop(ALARM_FILE, 240)
+    return (alarm_player, announcement_player)
 
-    # Start the looping announcement playlist
-    announcement_player.play_files_on_loop([SILENCE_FILE] + announcement_files, 240)
-
-    # Fade up to max volume over 45 seconds
-    fade_up([(alarm_player, 90), (announcement_player, 100)], 45, 10)
 
 def parse_iso(dt_str):
     return datetime.fromisoformat(dt_str)

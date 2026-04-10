@@ -125,14 +125,29 @@ class MpvProcess:
             logger.debug("mpv is not running or IPC socket missing")
         return None
 
+    def play_file(self, file_path):
+        self.send_command("playlist_clear")
+        self.send_command("set_property", ["loop-file", "no"])
+        self.send_command("set_property", ["loop-playlist", "no"])
+        self.send_command("loadfile", [file_path])
+
     def play_file_on_loop(self, file_path, max_length):
         num_loops = self.num_loops(max_length, file_path)
         self.send_command("set_property", ["loop-file", num_loops])
+        self.send_command("set_property", ["loop-playlist", "no"])
         self.send_command("loadfile", [file_path])
+
+    def play_files(self, file_paths):
+        self.send_command("playlist_clear")
+        self.send_command("set_property", ["loop-file", "no"])
+        self.send_command("set_property", ["loop-playlist", "no"])
+        for file_path in file_paths:
+            self.send_command("loadfile", [file_path, "append-play"])
 
     def play_files_on_loop(self, file_paths, max_length):
         num_loops = self.num_loops(max_length, *file_paths)
         self.send_command("playlist_clear")
+        self.send_command("set_property", ["loop-file", "no"])
         self.send_command("set_property", ["loop-playlist", num_loops])
         for file_path in file_paths:
             self.send_command("loadfile", [file_path, "append-play"])

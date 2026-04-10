@@ -56,6 +56,8 @@ class CalendarDay:
     def __post_init__(self):
         self.date_time = datetime.datetime.combine(self.date, datetime.time.min, tzinfo=ZoneInfo(TIMEZONE))
 
+    def all_events(self):
+        return self.whole_day_events + self.timed_events
 
 def load_google_creds():
     creds = None
