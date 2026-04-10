@@ -11,7 +11,7 @@ ANNOUNCEMENT_FILE = CACHE_DIRECTORY + "/audio/daily_summary.mp3"
 SILENCE = "audio/silence_5s.mp3"
 ANNOUNCEMENT_BACKGROUND_MUSIC = "audio/Daybreak.mp3"
 
-setup_logging(logging.DEBUG)
+setup_logging(logging.INFO)
 
 logger = logging.getLogger(__name__)
 
