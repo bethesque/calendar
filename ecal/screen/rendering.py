@@ -222,6 +222,10 @@ class RightStretchBox:
 
         if self.stroke > 0:
             border = (l + m, t + m, r - m, b - m)
+            # Not sure why, but sometimes the y1 was coming out smaller than y0, which was causing an error.
+            # I think it might happen when the box is right at the bottom of the screen, but need to do
+            # more testing.
+            border = (border[0], border[1], border[2], max(border[1], border[3]))
             draw.rectangle(
                 border, fill=self.fill, outline=self.outline, width=self.stroke
             )
