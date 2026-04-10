@@ -39,6 +39,14 @@
 # because we don't want to clash with the screen refresh as it could freeze the raspberry pi
 50 7-20 * * * cd /home/thetrav/calendar && ./script/check_for_alarms.sh "00:02:5B:AD:85:DB" "10" >> /home/thetrav/calendar/logs/cron.log  2>&
 
+# ====== ANNOUNCEMENTS ======
+
+# 7:20 on weekdays
+20 7 * * 1-5 cd /home/thetrav/calendar && ./script/morning_announcements.sh >> /home/thetrav/calendar/logs/cron.log  2>&1
+
+# 8:30 on weekends
+30 8 * * 0,6 cd /home/thetrav/calendar && ./script/morning_announcements.sh >> /home/thetrav/calendar/logs/cron.log  2>&1
+
 # ====== LOGS ======
 
 # Clean up app logs on Sunday mornings
