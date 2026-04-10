@@ -12,7 +12,7 @@ if [ -z "${1:-}" ]; then
 fi
 
 export DEVICE_MAC="$1"
-export PATH="/home/$(id -u)/.local/bin:${PATH}"
+export PATH="/home/$(id -un)/.local/bin:${PATH}"
 
 ./script/connect_bluetooth_speaker.sh
 
