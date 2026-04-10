@@ -39,8 +39,8 @@ def get_daily_summary_announcement(calendar_file=DATA_FILE):
     sentences = build_sentences(all_events)
     announcement = " ".join(sentences)
     logger.info(f"Generated daily summary announcement: {announcement}")
-    #announcement_file = text_to_voice_file_daily_summary(announcement)
-    announcement_file = "cache/audio/daily_summary.mp3"
+    announcement_file = text_to_voice_file_daily_summary(announcement)
+    #announcement_file = "cache/audio/daily_summary.mp3"
     return announcement_file
 
 """
