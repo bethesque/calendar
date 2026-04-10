@@ -200,7 +200,6 @@ def load_data_from_file(file_path):
         calendar_days = []
         for day in days:
             whole_day_events = [load_event(event) for event in day["whole_day_events"]]
-            print(f"Loaded whole_day_events: {whole_day_events}")
             timed_events = [load_event(event) for event in day["timed_events"]]
             calendar_day = CalendarDay(
                 date=datetime.date.fromisoformat(day["date"]),
