@@ -6,13 +6,14 @@ set -Eeuo pipefail
 echo "Checking for alarms at $(date)"
 
 # --- CONFIG ---
-if [ -z "${2:-}" ]; then
-    echo "Usage: $0 <device-mac> <window>" >&2
+if [ -z "${1:-}" ]; then
+    echo "Usage: $0 <window>" >&2
     exit 1
 fi
 
-export DEVICE_MAC="$1"
-WINDOW="$2"
+WINDOW="$1"
+
+source .env
 
 ./script/connect_bluetooth_speaker.sh
 

@@ -2,7 +2,7 @@
 
 set -Eeuo pipefail
 
-: "${DEVICE_MAC:?DEVICE_MAC environment variable is required}"
+: "${BLUETOOTH_SPEAKER_MAC:?BLUETOOTH_SPEAKER_MAC environment variable is required}"
 
 MAX_RETRIES=5
 
@@ -15,7 +15,7 @@ export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"
 # --- FUNCTIONS ---
 
 is_connected() {
-    bluetoothctl info "$DEVICE_MAC" | grep -q "Connected: yes"
+    bluetoothctl info "$BLUETOOTH_SPEAKER_MAC" | grep -q "Connected: yes"
 }
 
 get_bt_sink() {
@@ -28,12 +28,12 @@ is_audio_ready() {
 
 connect_bt() {
     echo "Connecting to Bluetooth device..."
-    printf "connect %s\nquit\n" "$DEVICE_MAC" | bluetoothctl
+    printf "connect %s\nquit\n" "$BLUETOOTH_SPEAKER_MAC" | bluetoothctl
 }
 
 # --- MAIN LOGIC ---
 
-echo "Checking Bluetooth status..."
+echo "Checking Bluetooth status for speaker ${BLUETOOTH_SPEAKER_MAC}..."
 
 if is_connected && is_audio_ready; then
     echo "Bluetooth already connected and audio ready ✅"

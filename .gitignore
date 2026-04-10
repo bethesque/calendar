@@ -12,3 +12,4 @@ pyvenv.cfg
 share
 cache
 *.egg-info/
+.env

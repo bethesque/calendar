@@ -14,6 +14,8 @@ fi
 export DEVICE_MAC="$1"
 export PATH="/home/$(id -un)/.local/bin:${PATH}"
 
+source .env
+
 ./script/connect_bluetooth_speaker.sh
 
 ecal-announce

@@ -63,6 +63,11 @@ install dependencies with:
 pip install -e .
 ```
 
+## environment configuration
+
+Copy `env.py.example` to `ecal/env.py` and set the required values.
+Copy `.env.example` to `.env` in the project root directory and set the required values.
+
 ## scheduling
 
 Schedule the screen and alarm tasks with `crontab crontab.txt`.
