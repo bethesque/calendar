@@ -3,11 +3,11 @@ import logging
 import os
 import argparse
 from datetime import datetime
-from ecal.log_config import setup_logging
+from ecal.alarms.log_config import setup_logging_for_cron
 from ecal.env import DATA_DIRECTORY
 from ecal.alarms.alarm import check_for_alarms
 
-setup_logging()
+setup_logging_for_cron()
 
 logger = logging.getLogger(__name__)
 

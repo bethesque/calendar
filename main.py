@@ -1,6 +1,6 @@
 import sys
 import logging
-from ecal.log_config import setup_logging
+from ecal.log_config import setup_logging_for_cron
 from ecal.google_calendar import CalendarSource
 from datetime import datetime
 from ecal.env import IS_LOCAL, STUB_DATA
@@ -9,7 +9,7 @@ from ecal.screen.hardware_screen import hardware_render
 from ecal.screen.model import Surface
 from ecal.screen.image import load_image
 
-setup_logging()
+setup_logging_for_cron()
 
 logger = logging.getLogger(__name__)
 

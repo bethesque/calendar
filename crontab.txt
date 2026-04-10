@@ -25,24 +25,22 @@
 # ====== SCREEN ======
 
 # Lazy refresh screen once an hour if data has changed - fetch the data just before the hour in case there is an alarm
-55 * * * * cd /home/thetrav/calendar && ./script/main.sh >> /home/thetrav/calendar/cron.log  2>&1
+55 * * * * cd /home/thetrav/calendar && ./script/main.sh >> /home/thetrav/calendar/logs/cron.log  2>&1
 
 # Check once a minute if the token has been updated and force refresh if so
-* * * * * cd /home/thetrav/calendar && ./script/main-update-screen-if-token-updated.sh >> /home/thetrav/calendar/cron.log  2>&1
+* * * * * cd /home/thetrav/calendar && ./script/main-update-screen-if-token-updated.sh >> /home/thetrav/calendar/logs/cron.log  2>&1
 
 # ====== ALARMS ======
 
 # Between 7am (inclusive) and 9pm (exclusive) check for alarms every 5 minutes from 0 to 45 minutes past the hour
-0-45/5 7-20 * * * cd /home/thetrav/calendar && ./script/check_for_alarms.sh "00:02:5B:AD:85:DB" "5" >> /home/thetrav/calendar/cron.log  2>&1
+0-45/5 7-20 * * * cd /home/thetrav/calendar && ./script/check_for_alarms.sh "00:02:5B:AD:85:DB" "5" >> /home/thetrav/calendar/logs/cron.log  2>&1
 
 # Between 7am (inclusive) and 9pm (exclusive) check for alarms in a 10 minute block at 50 minutes past the hour,
 # because we don't want to clash with the screen refresh as it could freeze the raspberry pi
-50 7-20 * * * cd /home/thetrav/calendar && ./script/check_for_alarms.sh "00:02:5B:AD:85:DB" "10" >> /home/thetrav/calendar/cron.log  2>&
+50 7-20 * * * cd /home/thetrav/calendar && ./script/check_for_alarms.sh "00:02:5B:AD:85:DB" "10" >> /home/thetrav/calendar/logs/cron.log  2>&
 
 # ====== LOGS ======
 
 # Clean up app logs on Sunday mornings
-0 2 * * 0 [ -f /home/thetrav/calendar/log.txt ] && /usr/bin/tail -n 500 /home/thetrav/calendar/log.txt > /home/thetrav/calendar/log.tmp && /bin/mv /home/thetrav/calendar/log.tmp /home/thetrav/calendar/log.txt
+0 2 * * 0 cd /home/thetrav/calendar && ./script/truncate_logs.sh
 
-# Clean up cron logs on Sunday mornings
-0 2 * * 0 [ -f /home/thetrav/calendar/cron.log ] && /usr/bin/tail -n 500 /home/thetrav/calendar/cron.log > /home/thetrav/calendar/cron.log.tmp && /bin/mv /home/thetrav/calendar/cron.log.tmp /home/thetrav/calendar/cron.log
