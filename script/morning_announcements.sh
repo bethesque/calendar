@@ -5,12 +5,6 @@ set -Eeuo pipefail
 
 echo "Morning announcements at $(date)"
 
-# --- CONFIG ---
-if [ -z "${1:-}" ]; then
-    echo "Usage: $0 <device-mac>" >&2
-    exit 1
-fi
-
 export DEVICE_MAC="$1"
 export PATH="/home/$(id -un)/.local/bin:${PATH}"
 
