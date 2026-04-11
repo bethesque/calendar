@@ -10,13 +10,25 @@ LAST_RENDERED_IMAGE_SHA_FILE = CACHE_DIRECTORY + "/last_rendered_image_sha.txt"
 
 logger = logging.getLogger(__name__)
 
-def load_image(calendar_source, surface, force):
+def load_image(calendar_source, surface, force, use_cached_data = False):
     creds = calendar_source.load_creds()
+
+    if use_cached_data:
+        return handle_use_cached_data(calendar_source, surface, force)
 
     if not creds or not creds.valid:
         return handle_invalid_creds(calendar_source, surface, force)
     else:
-        return handle_valid_creds(calendar_source, creds, surface, force)
+        return handle_valid_creds(calendar_source, creds, surface, force, use_cached_data)
+
+def handle_use_cached_data(calendar_source, surface, force):
+    if os.path.exists(DATA_FILE):
+        logger.info(f"Using cached calendar data from {DATA_FILE}")
+        calendar_days = calendar_source.load_data_from_file(DATA_FILE)
+        image = layout_calendars(calendar_days, surface)
+        return return_image_if_modified_or_forced(image, force)
+    else:
+        return None
 
 def handle_valid_creds(calendar_source, creds, surface, force):
     logger.info("Fetching calendar data from Google")
