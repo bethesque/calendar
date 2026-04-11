@@ -2,7 +2,7 @@ import logging
 import platform
 from ecal.env import DATA_DIRECTORY, STUB_DATA, IS_LOCAL
 from ecal.google_calendar import CalendarSource
-from ecal.screen.image import local_render
+from ecal.screen.image import local_render, save_last_rendered_image_sha
 from ecal.screen.hardware_screen import hardware_render
 from ecal.screen.layout import layout_calendars
 from ecal.screen.model import Surface
@@ -24,7 +24,7 @@ def render():
     logger.info("Loading calendar data from file: " + DATA_FILE)
     calendar_data = calendar_source.load_data_from_file(DATA_FILE)
     surface = Surface(*Surface.DEFAULT_DIMENSIONS)
-    image = layout_calendars(calendar_data, surface)
+    image = save_last_rendered_image_sha(layout_calendars(calendar_data, surface))
     logger.info("Rendering calendar image")
     renderer = local_render if IS_LOCAL else hardware_render
     renderer(image)

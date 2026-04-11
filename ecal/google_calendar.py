@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from operator import attrgetter
 import logging
 import json
-
+from ecal.string_utils import json_default_encoder
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -277,6 +277,11 @@ class CalendarSource:
 
     def load_data_from_file(self, file_path):
         return load_data_from_file(file_path)
+
+    def save_data_to_file(self, file_path, calendar_days):
+        data_json = json.dumps(calendar_days, sort_keys=True, default=json_default_encoder)
+        with open(file_path, "w") as f:
+            f.write(data_json)
 
 if __name__ == "__main__":
     print(f"calendars: {get_calendars()}")
