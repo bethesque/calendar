@@ -37,7 +37,7 @@
 
 # Between 7am (inclusive) and 9pm (exclusive) check for alarms in a 10 minute block at 50 minutes past the hour,
 # because we don't want to clash with the screen refresh as it could freeze the raspberry pi
-50 7-20 * * * cd /home/thetrav/calendar && ./script/check_for_alarms.sh "10" >> /home/thetrav/calendar/logs/cron.log  2>&
+50 7-20 * * * cd /home/thetrav/calendar && ./script/check_for_alarms.sh "10" >> /home/thetrav/calendar/logs/cron.log  2>&1
 
 # ====== ANNOUNCEMENTS ======
 
