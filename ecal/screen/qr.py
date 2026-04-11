@@ -56,7 +56,7 @@ Make a QR code with a black border, and a white label on the top with an extra t
 def make_qr_code_overlay(url, surface):
     qr = qrcode.QRCode(
         error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=10,
+        box_size=11,
         border=6,
     )
     qr.add_data(url)
