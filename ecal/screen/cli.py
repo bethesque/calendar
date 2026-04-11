@@ -11,13 +11,15 @@ setup_logging()
 
 logger = logging.getLogger(__name__)
 
+DATA_FILE = DATA_DIRECTORY + "/ecalendar-last-render.json"
+
 """
 Load the existing calendar data from the local file and render it.
 This is for dev and test only, to make it easier to iterate on the
 screen layout without having to fetch data from the Google Calendar API every time.
 """
 def render():
-    calendar_source = CalendarSource(stubbed=False)
+    calendar_source = CalendarSource(stubbed=False, cache_file_path=DATA_FILE)
     surface = Surface(*Surface.DEFAULT_DIMENSIONS)
     image = load_image(calendar_source, surface, True, True)
     logger.info("Rendering calendar image")

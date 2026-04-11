@@ -264,24 +264,38 @@ class FakeCreds:
 @dataclass
 class CalendarSource:
     stubbed: bool
+    cache_file_path: str
+    calendar_days: list = None
+    creds: any = None
 
     def load_creds(self):
         if self.stubbed:
-            return FakeCreds(valid=True)
-        return load_google_creds()
+            self.creds = FakeCreds(valid=True)
+        else:
+            self.creds = load_google_creds()
+        return self.creds
 
-    def fetch_data(self, creds, filter):
+    def creds_valid(self):
+        return self.creds and self.creds.valid
+
+    def fetch_data(self, filter):
         if self.stubbed:
-            return test_data()
-        return get_calendars(creds, filter)
+            self.calendar_days = test_data()
+        else:
+            self.calendar_days = get_calendars(self.creds, filter)
+        return self.calendar_days
 
-    def load_data_from_file(self, file_path):
-        return load_data_from_file(file_path)
+    def load_data_from_file(self):
+        self.calendar_days = load_data_from_file(self.cache_file_path)
+        return self.calendar_days
 
-    def save_data_to_file(self, file_path, calendar_days):
-        data_json = json.dumps(calendar_days, sort_keys=True, default=json_default_encoder)
-        with open(file_path, "w") as f:
+    def save_data_to_file(self):
+        data_json = json.dumps(self.calendar_days, sort_keys=True, default=json_default_encoder)
+        with open(self.cache_file_path, "w") as f:
             f.write(data_json)
+
+    def cache_file_exists(self):
+        return os.path.exists(self.cache_file_path)
 
 if __name__ == "__main__":
     print(f"calendars: {get_calendars()}")

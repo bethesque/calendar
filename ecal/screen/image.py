@@ -5,51 +5,37 @@ import logging
 import os
 import hashlib
 
-DATA_FILE = DATA_DIRECTORY + "/ecalendar-last-render.json"
+
 LAST_RENDERED_IMAGE_SHA_FILE = CACHE_DIRECTORY + "/last_rendered_image_sha.txt"
 
 logger = logging.getLogger(__name__)
 
 def load_image(calendar_source, surface, force, use_cached_data = False):
-    creds = calendar_source.load_creds()
+    calendar_source.load_creds()
+    calendar_days = None
+    image = None
 
-    if use_cached_data:
-        return handle_use_cached_data(calendar_source, surface, force)
+    if calendar_source.creds_valid() and not use_cached_data:
+        logger.info("Fetching calendar data from Google")
+        calendar_days = calendar_source.fetch_data(filter)
+        calendar_source.save_data_to_file()
+    elif calendar_source.cache_file_exists():
+        logger.info(f"Using cached calendar data from {calendar_source.cache_file_path}")
+        calendar_days = calendar_source.load_data_from_file()
 
-    if not creds or not creds.valid:
-        return handle_invalid_creds(calendar_source, surface, force)
-    else:
-        return handle_valid_creds(calendar_source, creds, surface, force, use_cached_data)
-
-def handle_use_cached_data(calendar_source, surface, force):
-    if os.path.exists(DATA_FILE):
-        logger.info(f"Using cached calendar data from {DATA_FILE}")
-        calendar_days = calendar_source.load_data_from_file(DATA_FILE)
+    if calendar_days:
         image = layout_calendars(calendar_days, surface)
-        return return_image_if_modified_or_forced(image, force)
-    else:
-        return None
-
-def handle_valid_creds(calendar_source, creds, surface, force):
-    logger.info("Fetching calendar data from Google")
-    calendar_days = calendar_source.fetch_data(creds, filter)
-    calendar_source.save_data_to_file(DATA_FILE, calendar_days)
-    image = layout_calendars(calendar_days, surface)
-    return return_image_if_modified_or_forced(image, force)
-
-def handle_invalid_creds(calendar_source, surface, force):
-    logger.info("Credentials invalid, rendering qr code for re-auth")
-
-    if os.path.exists(DATA_FILE):
-        # Show the QR code on top of the calendar screen using the cached data file
-        calendar_days = calendar_source.load_data_from_file(DATA_FILE)
-        image = layout_calendars(calendar_days, surface)
-        image = add_qr_code(SERVER_ADDRESS, surface, image)
+        if not calendar_source.creds_valid():
+            logger.info("Credentials invalid, rendering QR code for re-auth")
+            # Show the QR code on top of the calendar screen using the cached data file
+            image = add_qr_code(SERVER_ADDRESS, surface, image)
     else:
         # Show a blank screen with a QR code
+        logger.info("No cached calendar data found, rendering QR code for re-auth")
         image = make_qr_code(SERVER_ADDRESS, surface)
 
     return return_image_if_modified_or_forced(image, force)
+
 
 def return_image_if_modified_or_forced(image, force):
     last_image_sha = get_last_rendered_image_sha()

@@ -10,7 +10,7 @@ DATA_FILE = DATA_DIRECTORY + "/ecalendar-last-render.json"
 
 def refresh_calendar_data():
     print(f"Refreshing calendar data in {DATA_FILE}...")
-    calendar_source = CalendarSource(stubbed=False)
-    creds = calendar_source.load_creds()
-    calendar_days = calendar_source.fetch_data(creds, filter)
-    calendar_source.save_data_to_file(DATA_FILE, calendar_days)
+    calendar_source = CalendarSource(stubbed=False, cache_file_path=DATA_FILE)
+    calendar_source.load_creds()
+    calendar_source.fetch_data(filter)
+    calendar_source.save_data_to_file()
