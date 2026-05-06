@@ -142,3 +142,10 @@ My solution was to set a subdomain to resolve to a private network IP which I've
 While developing I run things locally, main.py contains a local and hardware rendering function. Set `IS_LOCAL = True` in your ecal/env.py file and it will print the screen to an image file and open it locally.
 
 I've also got a testData function for when I don't want to wait for a round trip from google or in case I want to test a hard-to-recreate data scenario.
+
+## Testing
+
+```bash
+.venv/bin/python -m pip install -e ".[dev]"
+.venv/bin/python -m pytest
+```

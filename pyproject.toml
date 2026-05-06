@@ -37,6 +37,7 @@ dependencies = [
 # Extra dependencies installed via `pip install ".[dev]"`
 dev = [
     "black",
+    "pytest==9.0.3"
 ]
 
 [project.urls]
