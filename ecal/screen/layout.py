@@ -123,10 +123,18 @@ class CalendarDayEventScroller:
     # allow a past event to be hidden.
     # Returns True if there are any more past events that can be hidden.
     def pop_past_timed_event(self, date_time=datetime.datetime.now().astimezone()):
-        if self.first_timed_event_is_in_past(date_time):
-            self.timed_events.pop(0)
+        index = self._index_of_next_event_ending_in_past(date_time)
+        if index != -1:
+            self.timed_events.pop(index)
 
-        return self.first_timed_event_is_in_past(date_time)
+        return self.any_events_in_past(date_time)
 
-    def first_timed_event_is_in_past(self, date_time):
-        return self.timed_events and self.timed_events[0].past(date_time)
+    def any_events_in_past(self, date_time):
+        return self._index_of_next_event_ending_in_past(date_time) != -1
+
+    def _index_of_next_event_ending_in_past(self, date_time) -> int:
+        for i, event in enumerate(self.timed_events):
+            if event.past_end(date_time):
+                return i
+        return -1
+

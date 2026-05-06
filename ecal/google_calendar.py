@@ -38,9 +38,11 @@ class Event:
     end_time: datetime.time = None
     recurring: bool = False
 
-    def past(self, time) -> bool:
+    def past_start(self, time) -> bool:
         return self.start_time < time
 
+    def past_end(self, time) -> bool:
+        return self.end_time is not None and self.end_time < time
 
 @dataclass
 class WeatherForecast(Event):
@@ -122,6 +124,7 @@ def add_events_to_calendars(events_from_google, calendar_name, displayed_calenda
 
             if "dateTime" in event_dict["start"]: # has a time specified
                 event.start_time = datetime.datetime.fromisoformat(event_dict["start"]["dateTime"])
+                event.end_time = datetime.datetime.fromisoformat(event_dict["end"]["dateTime"])
                 matched_day.timed_events.append(event)
             else:
                 matched_day.whole_day_events.append(event)
