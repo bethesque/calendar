@@ -85,6 +85,10 @@ def split_line(lines, line, font, pixel_width):
     lines.append(line[:break_index].strip())
     split_line(lines, line[break_index:].strip(), font, pixel_width)
 
+# Used to indicate during a dry run that all the children do not fit
+# into the given Surface.
+class ChildrenDoNotFit(Exception):
+    pass
 
 @dataclass
 class Text:
@@ -94,19 +98,19 @@ class Text:
     font: object = font()
     padding_top: int = 0
 
-    def render(self, draw: ImageDraw, image: Image, surface: Surface):
+    def render(self, draw: ImageDraw, image: Image, surface: Surface, dry_run: bool = False):
         text = self.wrapped_text(surface.right - surface.left)
 
         # Debugging - make the background of the text yellow
         # bbox = draw.multiline_textbbox((surface.left, surface.top + self.padding_top), text, font=self.font)
         # draw.rectangle(bbox, fill="yellow")
-
-        draw.text(
-            (surface.left, surface.top + self.padding_top),
-            text,
-            font=self.font,
-            fill=self.color,
-        )
+        if not dry_run:
+            draw.text(
+                (surface.left, surface.top + self.padding_top),
+                text,
+                font=self.font,
+                fill=self.color,
+            )
 
     """
     Sets the wrapped_text which is then cached for use in the render method. Suspect this shouldn't be cached.
@@ -136,8 +140,9 @@ class Icon:
     def height(self, width: int, draw: ImageDraw):
         return self.img().height
 
-    def render(self, draw: ImageDraw, image: Image, surface: Surface):
-        image.paste(self.img(), (surface.left, surface.top))
+    def render(self, draw: ImageDraw, image: Image, surface: Surface, dry_run: bool = False):
+        if not dry_run:
+            image.paste(self.img(), (surface.left, surface.top))
 
     def img(self):
         if self._img is not None:
@@ -147,8 +152,6 @@ class Icon:
             if self._img.mode != "1":
                 self._img = self._img.convert("1", dither=0)
             return self._img
-
-
 
 @dataclass
 class StackChildrenBox:
@@ -160,34 +163,38 @@ class StackChildrenBox:
     fill: int = None
     children: list = field(default_factory=list)
 
-    def render(self, draw: ImageDraw, image: Image, surface: Surface):
-        t = surface.top
-        b = surface.bottom
-        l = surface.left
-        r = surface.right
+    def render(self, draw: ImageDraw, image: Image, surface: Surface, dry_run: bool = False):
+        top = surface.top
+        bottom = surface.bottom
+        left = surface.left
+        right = surface.right
 
-        m = self.margin
-        p = self.padding
+        margin = self.margin
+        padding = self.padding
 
         if self.stroke > 0:
-            border = (l + m, t + m, r - m, b - m)
-            draw.rectangle(
-                border, fill=self.fill, outline=self.outline, width=self.stroke
-            )
+            border = (left + margin, top + margin, right - margin, bottom - margin)
+            if not dry_run:
+                draw.rectangle(
+                    border, fill=self.fill, outline=self.outline, width=self.stroke
+                )
 
-        t = t + m + p
+        child_top = top + margin + padding
         for child in self.children:
-            cl = l + m + p
-            cr = r - m - p
-            cw = cr - cl
-            ch = child.height(cw, draw)
-            cb = t + ch
-            if cb > b:
-                cb = b
-            cs = Surface(top=t, left=cl, right=cr, bottom=cb)
-            child.render(draw, image, cs)
-            t = t + ch
-            if cb == b:
+            child_left = left + margin + padding
+            child_right = right - margin - padding
+            child_width = child_right - child_left
+            child_height = child.height(child_width, draw)
+            child_bottom = child_top + child_height
+            if child_bottom > bottom:
+                if dry_run:
+                    raise ChildrenDoNotFit
+                child_bottom = bottom
+            child_surface = Surface(top=child_top, left=child_left, right=child_right, bottom=child_bottom)
+            child.render(draw, image, child_surface, dry_run)
+            child_top = child_top + child_height
+            # Break if we have reached the bottom of the surface
+            if child_bottom == bottom:
                 return
 
 
@@ -210,7 +217,7 @@ class RightStretchBox:
             self.right.height(width - self.left_width - borders(self) / 2, draw),
         ) + borders(self)
 
-    def render(self, draw: ImageDraw, image: Image, surface: Surface):
+    def render(self, draw: ImageDraw, image: Image, surface: Surface, dry_run: bool = False):
         t = surface.top
         b = surface.bottom
         l = surface.left
@@ -226,20 +233,21 @@ class RightStretchBox:
             # I think it might happen when the box is right at the bottom of the screen, but need to do
             # more testing.
             border = (border[0], border[1], border[2], max(border[1], border[3]))
-            draw.rectangle(
-                border, fill=self.fill, outline=self.outline, width=self.stroke
-            )
+            if not dry_run:
+                draw.rectangle(
+                    border, fill=self.fill, outline=self.outline, width=self.stroke
+                )
 
         cl = l + m + p
         cr = cl + self.left_width
         ct = t + m + p
         cb = self.height(w, draw)
         cs = Surface(top=ct, left=cl, right=cr, bottom=cb)
-        self.left.render(draw, image, cs)
+        self.left.render(draw, image, cs, dry_run)
         cl = cr
         cr = r - m - p
         cs = Surface(top=ct, left=cl, right=cr, bottom=cb)
-        self.right.render(draw, image, cs)
+        self.right.render(draw, image, cs, dry_run)
 
 
 @dataclass
@@ -252,7 +260,7 @@ class EqualChildrenBox:
     fill: int = None
     children: list = field(default_factory=list)
 
-    def render(self, draw: ImageDraw, image: Image, surface: Surface):
+    def render(self, draw: ImageDraw, image: Image, surface: Surface, dry_run: bool = False):
         t = surface.top
         b = surface.bottom
         h = b - t
@@ -265,9 +273,10 @@ class EqualChildrenBox:
 
         if self.stroke > 0:
             border = (l + m, t + m, r - m, b - m)
-            draw.rectangle(
-                border, fill=self.fill, outline=self.outline, width=self.stroke
-            )
+            if not dry_run:
+                draw.rectangle(
+                    border, fill=self.fill, outline=self.outline, width=self.stroke
+                )
 
         nc = len(self.children)
         for i, child in enumerate(self.children):
@@ -284,7 +293,7 @@ class EqualChildrenBox:
                 ct = t + m + p + int(step * i)
                 cb = t + m + p + int(step * (i + 1))
             cs = Surface(top=ct, left=cl, right=cr, bottom=cb)
-            child.render(draw, image, cs)
+            child.render(draw, image, cs, dry_run)
 
 
 @dataclass
@@ -297,7 +306,7 @@ class SingleChildBox:
     fill: int = None
     child: object = None
 
-    def render(self, draw: ImageDraw, image: Image, surface: Surface):
+    def render(self, draw: ImageDraw, image: Image, surface: Surface, dry_run: bool = False):
         t = surface.top
         b = surface.bottom
         l = surface.left
@@ -309,9 +318,10 @@ class SingleChildBox:
 
         if self.stroke > 0:
             border = (l + m, t + m, r - m, b - m)
-            draw.rectangle(
-                border, fill=self.fill, outline=self.outline, width=self.stroke
-            )
+            if not dry_run:
+                draw.rectangle(
+                    border, fill=self.fill, outline=self.outline, width=self.stroke
+                )
 
         child = self.child
         cl = l + m + p + s
@@ -319,7 +329,7 @@ class SingleChildBox:
         ct = t + m + p + s
         cb = b - m - p - s
         cs = Surface(top=ct, left=cl, right=cr, bottom=cb)
-        child.render(draw, image, cs)
+        child.render(draw, image, cs, dry_run)
 
     def height(self, width: int, draw: ImageDraw):
         return (

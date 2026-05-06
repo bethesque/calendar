@@ -31,7 +31,7 @@ def load_image(calendar_source, surface, force, use_cached_data = False):
             image = add_qr_code(SERVER_ADDRESS, surface, image)
     else:
         # Show a blank screen with a QR code
-        logger.info("No cached calendar data found, rendering QR code for re-auth")
+        logger.info(f"No cached calendar data found in {calendar_source.cache_file_path}, rendering QR code for re-auth")
         image = make_qr_code(SERVER_ADDRESS, surface)
 
     return return_image_if_modified_or_forced(image, force)

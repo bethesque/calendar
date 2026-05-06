@@ -34,9 +34,12 @@ class Event:
     owner: str
     summary: str
     description: str
-    start_time: datetime.time = None
+    start_time: datetime.time = None # These seem to be datetimes not times
     end_time: datetime.time = None
     recurring: bool = False
+
+    def past(self, time) -> bool:
+        return self.start_time < time
 
 
 @dataclass
@@ -137,6 +140,7 @@ def build_event(event_dict, calendar_name):
             image_path=choose_clothing_icon(event_dict["summary"]),
         )
     else:
+        # Yearly recurring events should be bold
         return Event(
             owner=calendar_name,
             summary=event_dict["summary"],
