@@ -92,7 +92,7 @@ def layout_calendar_days(calendar_day_scrollers):
 
 
 def extract_summary(event):
-    return "*** " + event.summary.upper() + " ***" if event.description and "#veryimportant" in event.description else event.summary
+    return event.summary.upper() if event.description and "#veryimportant" in event.description else event.summary
 
 def decide_summary_font(event):
     return important_font(size=FONT_SIZE_SUMMARY - 1) if is_important(event) else font(size=FONT_SIZE_SUMMARY)
