@@ -120,7 +120,7 @@ def add_events_to_calendars(events_from_google, calendar_name, displayed_calenda
         matched_days = [d for d in displayed_calendar_days if displayed_day_includes_event(d, event_dict)]
 
         for matched_day in matched_days:
-            event = build_event(event_dict, calendar_name)
+            event = build_event(event_dict, calendar_name, matched_day.date)
 
             if "dateTime" in event_dict["start"]: # has a time specified
                 event.start_time = datetime.datetime.fromisoformat(event_dict["start"]["dateTime"])
@@ -134,13 +134,13 @@ def is_weather_forecast(event_dict):
     return event_dict["summary"].startswith("Min ") or event_dict["summary"].startswith("Max ")
 
 
-def build_event(event_dict, calendar_name):
+def build_event(event_dict, calendar_name, date: datetime.date):
     if is_weather_forecast(event_dict):
         return WeatherForecast(
             owner=calendar_name,
             summary=event_dict["summary"],
             description="",
-            image_path=choose_clothing_icon(event_dict["summary"]),
+            image_path=choose_clothing_icon(event_dict["summary"], date),
         )
     else:
         # Yearly recurring events should be bold
@@ -242,7 +242,7 @@ def test_data():
     today = calendars[0]
     tomorrow = calendars[1]
     forecast = "Min 11, Max 16, 1-8mm 90%, Showers, Windy"
-    today.whole_day_events.append(WeatherForecast("BoM", forecast, "", image_path=choose_clothing_icon(forecast)))
+    today.whole_day_events.append(WeatherForecast("BoM", forecast, "", image_path=choose_clothing_icon(forecast, datetime.date.today())))
     today.whole_day_events.append(Event("Trav", "Working on calendar epaper thing", "Once off event"))
     today.whole_day_events.append(Event("Trav", "A very important event", "#veryimportant", recurring=True))
     today.whole_day_events.append(Event("Trav", "A normal recurring event", "", recurring=True))
