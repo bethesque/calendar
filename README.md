@@ -40,19 +40,8 @@ The thing requires a few system dependencies.
 This is really only relevant on the pi itself, which is running a debian thingy, so apt-get with:
 TODO: add system dependencies for screen
 
-Raspberry pi:
 
-```
-sudo apt install mpv
-```
-
-Mac:
-
-```
-brew install mpv
-```
-
-the 12.48 screen uses some rando's lgpio c library which I'm not super happy about
+The 12.48 screen uses some rando's lgpio c library which I'm not super happy about
 instructions here:
 https://www.waveshare.com/wiki/12.48inch_e-Paper_Module_(B)#Install_Python_Library
 
