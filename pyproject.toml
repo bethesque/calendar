@@ -28,9 +28,7 @@ dependencies = [
     "qrcode==7.4.2",
     "CherryPy==18.10.0",
     "requests==2.31.0",
-    "tzdata",
-    "mutagen==1.47.0",
-    "gtts==2.5.4",
+    "tzdata"
 ]
 
 [project.optional-dependencies]
@@ -46,15 +44,8 @@ Homepage = "https://github.com/thetrav/calendar"
 
 [project.scripts]
 
-ecal-alarm-stop = "ecal.alarms.cli:stop_alarm"
-ecal-alarm-test = "ecal.alarms.cli:test_alarm"
-ecal-alarm-check = "ecal.alarms.cli:check_alarms"
-
-ecal-announce = "ecal.announcements.announce:announce" # Morning summary announcement
-ecal-announce-cached = "ecal.announcements.announce:play_morning_summary_announcement" # Play the cached voice file
 
 ecal-data-refresh = "ecal.cli:refresh_calendar_data"
-
 ecal-screen-render = "ecal.screen.cli:render" # Render the screen using the cached calendar data
 ecal-screen-clear = "ecal.screen.cli:clear_screen"
 

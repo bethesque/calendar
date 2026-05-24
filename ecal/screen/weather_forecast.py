@@ -7,8 +7,6 @@ UNKNOWN_CLOTHING = "images/unknown_clothing.png"
 
 
 def choose_clothing_icon(forecast, date):
-  print(f"The date for the forecast is {str(date)}")
-  print(f"The month is {date.month}")
   # Extract Min temperature
   min_match = re.search(r"Min\s+(\d+)", forecast)
   min_temp = int(min_match.group(1)) if min_match else None
