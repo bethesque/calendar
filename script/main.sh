@@ -15,4 +15,4 @@ fi
 
 echo "Executing main"
 # Allow use of cached image
-"$PYTH" main.py
+timeout --kill-after=30s 600 "$PYTH" main.py
