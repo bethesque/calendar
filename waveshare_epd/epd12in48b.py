@@ -192,10 +192,9 @@ class EPD(object):
                 row_start = y * bytes_per_row
                 send_data2(Redbuf_inv[row_start + x_start : row_start + x_end])
             logger.info("finished sending region")
-            check_timeout("Sending region too too long")
+            self.check_timeout("Sending region took too long")
 
         # --- Send all 4 regions ---
-
         send_region(self.S2_SendCommand, self.S2_SendData2, 0, 492, 0, 81)
         send_region(self.M2_SendCommand, self.M2_SendData2, 0, 492, 81, 163)
         send_region(self.M1_SendCommand, self.M1_SendData2, 492, 984, 0, 81)
@@ -426,7 +425,7 @@ class EPD(object):
             if now - last_log >= 10:
                 logger.info("M1 busy... %.1f seconds elapsed", now - start)
                 last_log = now
-                check_timeout("M1 busy for too long")
+                self.check_timeout("M1 busy for too long")
 
             self.M1_SendCommand(0x71)
             busy = epdconfig.digital_read(self.EPD_M1_BUSY_PIN)
@@ -448,7 +447,7 @@ class EPD(object):
             if now - last_log >= 10:
                 logger.info("M2 busy... %.1f seconds elapsed", now - start)
                 last_log = now
-                check_timeout("M2 busy for too long")
+                self.check_timeout("M2 busy for too long")
 
             self.M2_SendCommand(0x71)
             busy = epdconfig.digital_read(self.EPD_M2_BUSY_PIN)
@@ -470,7 +469,7 @@ class EPD(object):
             if now - last_log >= 10:
                 logger.info("S1 busy... %.1f seconds elapsed", now - start)
                 last_log = now
-                check_timeout("S1 busy for too long")
+                self.check_timeout("S1 busy for too long")
 
             self.S1_SendCommand(0x71)
             busy = epdconfig.digital_read(self.EPD_S1_BUSY_PIN)
@@ -492,7 +491,7 @@ class EPD(object):
             if now - last_log >= 10:
                 logger.info("S2 busy... %.1f seconds elapsed", now - start)
                 last_log = now
-                check_timeout("S2 busy for too long")
+                self.check_timeout("S2 busy for too long")
 
             self.S2_SendCommand(0x71)
             busy = epdconfig.digital_read(self.EPD_S2_BUSY_PIN)
