@@ -154,8 +154,10 @@ class EPD(object):
 
         self.SetLut()
 
-    def display(self, BlackImage, RedImage):
-        start = time.perf_counter()
+    def display(self, BlackImage, RedImage, timeout=300):
+        start = time.monotonic()
+        self.limit = start + timeout
+
 
         width = self.width
         height = self.height
@@ -190,6 +192,7 @@ class EPD(object):
                 row_start = y * bytes_per_row
                 send_data2(Redbuf_inv[row_start + x_start : row_start + x_end])
             logger.info("finished sending region")
+            check_timeout("Sending region too too long")
 
         # --- Send all 4 regions ---
 
@@ -198,7 +201,7 @@ class EPD(object):
         send_region(self.M1_SendCommand, self.M1_SendData2, 492, 984, 0, 81)
         send_region(self.S1_SendCommand, self.S1_SendData2, 492, 984, 81, 163)
 
-        end = time.perf_counter()
+        end = time.monotonic()
         print("use time: %f" % (end - start))
 
         logger.info("starting TurnOnDisplay()")
@@ -207,7 +210,7 @@ class EPD(object):
 
     def clear(self):
         """Clear contents of image buffer"""
-        start = time.perf_counter()
+        start = time.monotonic()
 
         self.S2_SendCommand(0x10)
         for y in range(0, 492):
@@ -245,9 +248,7 @@ class EPD(object):
             for x in range(81, 163):
                 self.S1_SendData(0x00)
 
-        end = time.perf_counter()
-        print(end)
-        print(start)
+        end = time.monotonic()
         print("use time: %f" % (end - start))
 
         self.TurnOnDisplay()
@@ -425,6 +426,7 @@ class EPD(object):
             if now - last_log >= 10:
                 logger.info("M1 busy... %.1f seconds elapsed", now - start)
                 last_log = now
+                check_timeout("M1 busy for too long")
 
             self.M1_SendCommand(0x71)
             busy = epdconfig.digital_read(self.EPD_M1_BUSY_PIN)
@@ -446,6 +448,7 @@ class EPD(object):
             if now - last_log >= 10:
                 logger.info("M2 busy... %.1f seconds elapsed", now - start)
                 last_log = now
+                check_timeout("M2 busy for too long")
 
             self.M2_SendCommand(0x71)
             busy = epdconfig.digital_read(self.EPD_M2_BUSY_PIN)
@@ -467,6 +470,7 @@ class EPD(object):
             if now - last_log >= 10:
                 logger.info("S1 busy... %.1f seconds elapsed", now - start)
                 last_log = now
+                check_timeout("S1 busy for too long")
 
             self.S1_SendCommand(0x71)
             busy = epdconfig.digital_read(self.EPD_S1_BUSY_PIN)
@@ -488,6 +492,7 @@ class EPD(object):
             if now - last_log >= 10:
                 logger.info("S2 busy... %.1f seconds elapsed", now - start)
                 last_log = now
+                check_timeout("S2 busy for too long")
 
             self.S2_SendCommand(0x71)
             busy = epdconfig.digital_read(self.EPD_S2_BUSY_PIN)
@@ -495,6 +500,10 @@ class EPD(object):
 
         logger.info("S2 ready after %.1f seconds", time.time() - start)
         time.sleep(0.2)
+
+    def check_timeout(self, message):
+        if time.monotonic() > self.limit:
+            raise TimeoutError(message)
 
     lut_vcom1 = [
         0x00,
