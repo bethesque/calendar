@@ -18,7 +18,7 @@ def hardware_render_worker(image):
         logger.info("hardware_render time: %.3f seconds", end - start)
     except IOError as e:
         logger.exception(f"Error rending screen: {e}")
-    finally
+    finally:
         epd12in48b.epdconfig.module_exit()
 
 
