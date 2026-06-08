@@ -1,6 +1,9 @@
 from ecal.screen.rendering import *
 from ecal.google_calendar import CalendarDay, WeatherForecast
 import datetime
+import logging
+
+logger = logging.getLogger(__name__)
 
 weekdays = [
     "Monday",
@@ -21,6 +24,16 @@ def layout_calendars(calendar_days: list[CalendarDay], surface):
 
     calendar_day_scrollers = [ CalendarDayEventScroller(day) for day in calendar_days]
 
+    pop_past_events_if_all_events_do_not_fit(image, draw, surface, calendar_day_scrollers)
+
+    # Do the real render
+    box = layout_calendar_days(calendar_day_scrollers)
+    box.render(draw, image, surface)
+
+    return image
+
+
+def pop_past_events_if_all_events_do_not_fit(image, draw, surface, calendar_day_scrollers):
     events_fit = False
     more_events_can_be_hidden = True
     # Do a dry run render. If there are any events that do not fit, keep
@@ -28,16 +41,15 @@ def layout_calendars(calendar_days: list[CalendarDay], surface):
     # or there are no more past events that can be hidden.
     while not events_fit and more_events_can_be_hidden:
         try:
-            box = layout_calendar_days(calendar_day_scrollers)
+            box = layout_calendar_days(calendar_day_scrollers[0:1])
+            # Do a trial render, raising an error if there is not enough vertical room
+            # to fit all the events into the day box
             box.render(draw, image, surface, True)
             events_fit = True
         except ChildrenDoNotFit:
             more_events_can_be_hidden = calendar_day_scrollers[0].pop_past_timed_event()
 
-    # Do the real render
-    box.render(draw, image, surface)
 
-    return image
 
 def layout_calendar_days(calendar_day_scrollers):
     box = EqualChildrenBox(padding=5, stroke=0)
@@ -125,7 +137,8 @@ class CalendarDayEventScroller:
     def pop_past_timed_event(self, date_time=datetime.datetime.now().astimezone()):
         index = self._index_of_next_event_ending_in_past(date_time)
         if index != -1:
-            self.timed_events.pop(index)
+            event = self.timed_events.pop(index)
+            logger.info(f"Popping past event {event.summary} as there isn't enough room to display it")
 
         return self.any_events_in_past(date_time)
 

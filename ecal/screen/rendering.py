@@ -1,6 +1,9 @@
 from PIL import Image, ImageDraw, ImageFont
 from dataclasses import dataclass, field
 from ecal.screen.model import Surface
+import logging
+
+logger = logging.getLogger(__name__)
 
 # FONT_SIZE_H1 = 50
 # FONT_SIZE_DEFAULT = 24
