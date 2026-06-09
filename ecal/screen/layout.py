@@ -96,9 +96,9 @@ def layout_calendar_days(calendar_day_scrollers):
                     margin=2,
                     left_width=LEFT_WIDTH,
                     left=Text(
-                        f"{event.owner}\n{event.start_time.strftime('%I:%M %p')}"
+                        f"{event.owner}\n{event.start_time.strftime('%I:%M %p').replace(":00 ", "").lstrip('0').lower()}"
                     ),
-                    right=Text(summary, font=summary_font, padding_top=4, color=BLACK),
+                    right=Text(summary, font=summary_font, color=BLACK),
                 )
             )
 

@@ -104,10 +104,11 @@ class Text:
     def render(self, draw: ImageDraw, image: Image, surface: Surface, dry_run: bool = False):
         text = self.wrapped_text(surface.right - surface.left)
 
-        # Debugging - make the background of the text yellow
-        # bbox = draw.multiline_textbbox((surface.left, surface.top + self.padding_top), text, font=self.font)
-        # draw.rectangle(bbox, fill="yellow")
         if not dry_run:
+            # Debugging - make the background of the text yellow
+            # bbox = draw.multiline_textbbox((surface.left, surface.top + self.padding_top), text, font=self.font)
+            # draw.rectangle(bbox, fill="yellow")
+
             draw.text(
                 (surface.left, surface.top + self.padding_top),
                 text,
