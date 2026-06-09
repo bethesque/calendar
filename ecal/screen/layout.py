@@ -34,6 +34,10 @@ def layout_calendars(calendar_days: list[CalendarDay], surface):
 
 
 def pop_past_events_if_all_events_do_not_fit(image, draw, surface, calendar_day_scrollers):
+    # Need to provide an empty day to the right of the current day, so that the ChildrenDoNotFit
+    # exception can't possibly be thrown by the second day.
+    # We're only popping *past* events when they don't fit, so we can't pop any from tomorrow.
+    empty_day = CalendarDayEventScroller(CalendarDay(date=datetime.datetime.now(), whole_day_events=[], timed_events=[]))
     events_fit = False
     more_events_can_be_hidden = True
     # Do a dry run render. If there are any events that do not fit, keep
@@ -41,7 +45,7 @@ def pop_past_events_if_all_events_do_not_fit(image, draw, surface, calendar_day_
     # or there are no more past events that can be hidden.
     while not events_fit and more_events_can_be_hidden:
         try:
-            box = layout_calendar_days(calendar_day_scrollers[0:1])
+            box = layout_calendar_days([calendar_day_scrollers[0], empty_day])
             # Do a trial render, raising an error if there is not enough vertical room
             # to fit all the events into the day box
             box.render(draw, image, surface, True)
