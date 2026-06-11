@@ -15,7 +15,7 @@ if [ -f token.json ] && { [ ! -f ecalendar-last-render.json ] || [ token.json -n
   fi
 
   if [ -f .venv/bin/activate ]; then
-    source .venv/bin/activate
+    . .venv/bin/activate
   fi
 
   echo "Executing main with --force"

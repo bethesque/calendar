@@ -14,7 +14,7 @@ else
 fi
 
 if [ -f .venv/bin/activate ]; then
-  source .venv/bin/activate
+  . .venv/bin/activate
 fi
 
 echo "Executing main"
