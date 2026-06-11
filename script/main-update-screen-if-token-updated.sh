@@ -14,6 +14,10 @@ if [ -f token.json ] && { [ ! -f ecalendar-last-render.json ] || [ token.json -n
     PYTH="python"
   fi
 
+  if [ -f .venv/bin/activate ]; then
+    source .venv/bin/activate
+  fi
+
   echo "Executing main with --force"
   timeout --kill-after=30s 600 "$PYTH" main.py --force
 else

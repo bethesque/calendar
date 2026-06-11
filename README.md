@@ -55,7 +55,7 @@ pip install -e .
 
 # Runtime
 
-git clone or copy this repo to the rasberry pi.  I keep mine in /home/thetrav/calendar
+git clone or copy this repo to the rasberry pi.  I keep mine in /home/pi/calendar
 
 install dependencies with:
 ```
@@ -95,7 +95,7 @@ python index.py
 
 The server invokes a locally running cherryPi app which needs to be set up as service with:
 ```
-sudo cp /home/thetrav/calendar/epcal.service /lib/systemd/system/epcal.service
+sudo cp /home/pi/calendar/epcal.service /lib/systemd/system/epcal.service
 ```
 
 Reload with:
@@ -137,4 +137,18 @@ I've also got a testData function for when I don't want to wait for a round trip
 ```bash
 .venv/bin/python -m pip install -e ".[dev]"
 .venv/bin/python -m pytest
+```
+
+
+
+```bash
+sudo apt update
+
+sudo apt install python3-pip git -y
+git clone https://github.com/bethesque/calendar.git
+cd calendar
+git checkout 12in48b
+python -m venv .venv
+source .venv/bin/activate
+pip install -e .
 ```

@@ -40,7 +40,7 @@ dev = [
 
 [project.urls]
 # Links displayed on PyPI
-Homepage = "https://github.com/thetrav/calendar"
+Homepage = "https://github.com/bethesque/calendar"
 
 [project.scripts]
 

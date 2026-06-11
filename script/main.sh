@@ -13,6 +13,10 @@ else
   PYTH="python"
 fi
 
+if [ -f .venv/bin/activate ]; then
+  source .venv/bin/activate
+fi
+
 echo "Executing main"
 # Allow use of cached image
 timeout --kill-after=30s 600 "$PYTH" main.py
