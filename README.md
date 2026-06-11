@@ -143,8 +143,8 @@ I've also got a testData function for when I don't want to wait for a round trip
 
 ```bash
 sudo apt update
-
 sudo apt install python3-pip git -y
+sudo apt install libfreetype6 libjpeg62-turbo libpng16-16t64 zlib1g libopenjp2-7 -y
 git clone https://github.com/bethesque/calendar.git
 cd calendar
 git checkout 12in48b

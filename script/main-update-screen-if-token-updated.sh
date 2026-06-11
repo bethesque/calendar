@@ -7,19 +7,12 @@ set -Eeuo pipefail
 if [ -f token.json ] && { [ ! -f ecalendar-last-render.json ] || [ token.json -nt ecalendar-last-render.json ]; }; then
   touch ecalendar-last-render.json
 
-  # Make this work on mac and on the raspberry pi.
-  if [ -x "/usr/bin/python" ]; then
-    PYTH="/usr/bin/python"
-  else
-    PYTH="python"
-  fi
-
   if [ -f .venv/bin/activate ]; then
     . .venv/bin/activate
   fi
 
   echo "Executing main with --force"
-  timeout --kill-after=30s 600 "$PYTH" main.py --force
+  timeout --kill-after=30s 600 python main.py --force
 else
   echo "calendar rendered more recently than tokens fetched"
 fi
