@@ -1,0 +1,6 @@
+[global]
+server.socket_port = 443
+server.socket_host = "0.0.0.0"
+server.ssl_certificate = "ecal.travis.dixon.net.au.pem"
+server.ssl_private_key = "ecal.travis.dixon.net.au-key.pem"
+server.ssl_module = "builtin"

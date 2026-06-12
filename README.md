@@ -151,4 +151,31 @@ git checkout 12in48b
 python -m venv .venv
 source .venv/bin/activate
 pip install -e .
+cp env.py.example ecal/env.py
+```
+
+Update `env.py` with real values.
+
+```
+crontab crontab.txt
+```
+
+```
+openssl req -x509 -newkey rsa:2048 -sha256 -nodes \
+  -keyout ecal.travis.dixon.net.au-key.pem \
+  -out ecal.travis.dixon.net.au.pem \
+  -days 36500 \
+  -subj "/CN=ecal.travis.dixon.net.au" \
+  -addext "subjectAltName=DNS:ecal.travis.dixon.net.au,DNS:travcal,IP:192.168.20.31"
+
+chmod 600 ecal.travis.dixon.net.au-key.pem
+chmod 644 ecal.travis.dixon.net.au.pem
+```
+
+```
+sudo cp /home/pi/calendar/epcal.service /lib/systemd/system/epcal.service
+cp server.conf.template server.conf
+sudo systemctl daemon-reload
+sudo systemctl start epcal.service
+sudo systemctl status epcal.service
 ```

@@ -3,6 +3,7 @@ import cherrypy
 import google_auth_oauthlib.flow
 from ecal.env import SERVER_ADDRESS, SCOPE, login_hint
 from ecal.log_config import setup_logging_for_http_server
+from pathlib import Path
 
 setup_logging_for_http_server()
 
@@ -49,4 +50,7 @@ class CalendarWebServer(object):
         return "Welcome back. The calendar screen should update within a few minutes."
 
 if __name__ == "__main__":
+    if Path("server.conf").is_file():
+        logger.info("Loading config file from server.conf")
+        cherrypy.config.update("server.conf")
     cherrypy.quickstart(CalendarWebServer())
