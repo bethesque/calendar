@@ -4,7 +4,7 @@ After=multi-user.target
 
 [Service]
 WorkingDirectory=/home/pi/calendar
-ExecStart=.venv/bin/python index.py
+ExecStart=/home/pi/calendar/.venv/bin/python index.py
 User=pi
 
 [Install]

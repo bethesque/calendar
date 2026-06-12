@@ -178,4 +178,5 @@ cp server.conf.template server.conf
 sudo systemctl daemon-reload
 sudo systemctl start epcal.service
 sudo systemctl status epcal.service
+journalctl -f -u epcal
 ```

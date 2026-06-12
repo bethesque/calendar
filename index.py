@@ -13,6 +13,10 @@ logger = logging.getLogger(__name__)
 class CalendarWebServer(object):
     @cherrypy.expose
     def index(self):
+        return "<a href='login'>Login</a>"
+
+    @cherrypy.expose
+    def login(self):
         flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
             "client_secret.json",
             scopes=[SCOPE],
