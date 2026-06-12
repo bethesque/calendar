@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 class CalendarWebServer(object):
     @cherrypy.expose
     def index(self):
-        return "<a href='login'>Login</a>"
+        return "<ul><li><a href='login'>Login</a></li><li><a href='refresh'>Refresh</a></li></ul>"
 
     @cherrypy.expose
     def login(self):
@@ -52,6 +52,11 @@ class CalendarWebServer(object):
             print(flow.credentials.to_json(), file=text_file)
 
         return "Welcome back. The calendar screen should update within a few minutes."
+
+    @cherrypy.expose
+    def refresh(self):
+        Path("token.json").touch()
+        return "Screen should update within a few minutes. <a href='/'>Back</a>"
 
 if __name__ == "__main__":
     if Path("server.conf").is_file():
