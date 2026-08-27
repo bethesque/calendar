@@ -25,7 +25,7 @@
 # ====== SCREEN ======
 
 # Lazy refresh screen once an hour if data has changed - fetch the data just before the hour in case there is an alarm
-55 * * * * cd /home/pi/calendar && ./script/main.sh >> /home/pi/calendar/logs/cron.log  2>&1
+57 * * * * cd /home/pi/calendar && ./script/main.sh >> /home/pi/calendar/logs/cron.log  2>&1
 
 # Check once a minute if the token has been updated and force refresh if so
 * * * * * cd /home/pi/calendar && ./script/main-update-screen-if-token-updated.sh >> /home/pi/calendar/logs/cron.log  2>&1
