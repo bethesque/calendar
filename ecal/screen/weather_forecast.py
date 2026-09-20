@@ -21,16 +21,16 @@ def choose_clothing_icon(forecast, date):
 
   # Between May and November, always wear long pants
   if is_april_to_november(date):
-    if max_temp < 21:
+    if max_temp <= 20:
       return LONG_SHIRT_AND_LONG_PANTS_ICON_PATH
     
-    if max_temp < 26:
-       return TSHIRT_AND_LONG_PANTS_ICON_PATH
+    if max_temp >= 24:
+      return TSHIRT_AND_SHORTS_ICON_PATH
 
-    return LONG_SHIRT_AND_LONG_PANTS_ICON_PATH
+    return TSHIRT_AND_LONG_PANTS_ICON_PATH
 
 
-  if max_temp < 19:
+  if max_temp <= 18:
     return LONG_SHIRT_AND_LONG_PANTS_ICON_PATH
 
   if max_temp >= 24:
