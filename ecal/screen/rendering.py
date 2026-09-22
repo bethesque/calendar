@@ -185,6 +185,7 @@ class StackChildrenBox:
 
         child_top = top + margin + padding
         for child in self.children:
+            stack_full = False
             child_left = left + margin + padding
             child_right = right - margin - padding
             child_width = child_right - child_left
@@ -193,12 +194,13 @@ class StackChildrenBox:
             if child_bottom > bottom:
                 if dry_run:
                     raise ChildrenDoNotFit
+                stack_full = True
                 child_bottom = bottom
             child_surface = Surface(top=child_top, left=child_left, right=child_right, bottom=child_bottom)
             child.render(draw, image, child_surface, dry_run)
             child_top = child_top + child_height
             # Break if we have reached the bottom of the surface
-            if child_bottom == bottom:
+            if stack_full:
                 return
 
 
